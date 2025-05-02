@@ -1,0 +1,106 @@
+{% extends "Base3.html" %}
+{% load static %}
+{% block titulo %} Mundo Bovino {% endblock %}
+{% block css %}
+<link href="{% static 'css/configuraciones.css' %}" rel="stylesheet">
+{% endblock %}
+{% block contenido %} {% endblock %}
+
+{% block main %}
+{% if messages %}
+    <div class="mensajes-container">
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">
+                {{ message }}
+                <button type="button" class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+    <!-- Avatar fuera del contenedor principal (foto predeterminada) -->
+    <div class="avatar-section">
+        <div class="avatar-circle">
+            <div class="avatar-placeholder">
+                <i class="fas fa-user"></i>
+            </div>
+            <!-- Eliminamos el camera-icon ya que no permitiremos cambiar la foto -->
+        </div>
+    </div>
+
+    <div class="perfil-container">
+        <form method="post" action="{% url 'configuraciones' %}" id="perfil-form">
+            {% csrf_token %}
+            <div class="form-section">
+                <div class="campo-grupo">
+                    <label for="nombreUsuario">Nombre de Usuario</label>
+                    <div class="input-con-icono">
+                        <input type="text" class="form-control" id="nombreUsuario" name="nom_usu" placeholder="{{ admin.nom_usu }}">
+                        <span class="edit-icon"><i class="fas fa-edit"></i></span>
+                    </div>
+                </div>
+                
+                <div class="campo-grupo">
+                    <label for="email">Email</label>
+                    <div class="input-con-icono">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="{{ admin.correo }}">
+                        <span class="edit-icon"><i class="fas fa-edit"></i></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modulos-seccion">
+                <h4>Módulos</h4>
+                <div class="modulos-grid">
+                    <div class="modulo-item">
+                        <input type="checkbox" id="inventario" name="inventario" {% if perfil.modulo_inventario %}checked{% endif %}>
+                        <label for="inventario">Inventario</label>
+                    </div>
+                    <div class="modulo-item">
+                        <input type="checkbox" id="registroVentas" name="registroVentas" {% if perfil.modulo_ventas %}checked{% endif %}>
+                        <label for="registroVentas">Registro de Ventas</label>
+                    </div>
+                    <div class="modulo-item">
+                        <input type="checkbox" id="calendario" name="calendario" {% if perfil.modulo_calendario %}checked{% endif %}>
+                        <label for="calendario">Calendario</label>
+                    </div>
+                    <div class="modulo-item">
+                        <input type="checkbox" id="documentos" name="documentos" {% if perfil.modulo_documentos %}checked{% endif %}>
+                        <label for="documentos">Documentos</label>
+                    </div>
+                    <div class="modulo-item">
+                        <input type="checkbox" id="contactos" name="contactos" {% if perfil.modulo_agenda %}checked{% endif %}>
+                        <label for="contactos">Agenda</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Separador con borde -->
+            <div class="separador-boton"></div>
+
+            <div class="boton-seccion">
+                <button type="button" class="btn-guardar" data-bs-toggle="modal" data-bs-target="#exampleModal">Guardar Cambios</button>
+            </div>
+        </form>
+        
+        <!-- Modal de Bootstrap -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">¡Alerta!</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Contenido del modal -->
+                        <p>¿Estás seguro que desea guardar los cambios realizados?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn" onclick="document.getElementById('perfil-form').submit();">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

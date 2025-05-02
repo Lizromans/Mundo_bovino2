@@ -1,0 +1,44 @@
+{% extends "Base2.html" %}
+{% block title %} Mundo Bovino {% endblock %}
+{% block titulo %} Mundo Bovino {% endblock %}
+{% load static %}
+
+{% block css %}
+<link href="{% static 'css/home.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block main %}
+{% if messages %}
+    <div class="mensajes-container">
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">
+                {{ message }}
+                <button type="button" class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="encabezado">
+            <h6 class="mb-3"><b>Portal Informativo</b></h6>
+        </div>
+        <!-- Columna de Video -->
+        <div class="col-md-4">
+            <div class="video-container">
+                <video autoplay muted loop>
+                    <source src="{% static 'videos/video1.mp4' %}" type="video/mp4">
+                    Tu navegador no soporta el video.
+                </video>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div id="noticias-container" class="noticias-grid">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/noticias.js' %}"></script>
+{% endblock %}

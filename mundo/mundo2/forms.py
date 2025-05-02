@@ -1,0 +1,65 @@
+from django import forms
+from .models import Administrador
+from django.core.exceptions import ValidationError
+
+class AdministradorRegistroForm(forms.ModelForm):
+    # No necesitamos definir confcontraseña como un field adicional porque ya está en el modelo
+    
+    class Meta:
+        model = Administrador
+        fields = ['nom_usu', 'correo', 'finca', 'contraseña', 'confcontraseña']
+        widgets = {
+            'nom_usu': forms.TextInput(attrs={'class': 'form-control', 'id': 'username'}),
+            'correo': forms.EmailInput(attrs={'class': 'form-control', 'id': 'email'}),
+            'finca': forms.TextInput(attrs={'class': 'form-control', 'id': 'finca'}),
+            'contraseña': forms.PasswordInput(attrs={'class': 'form-control', 'id': 'password'}),
+            'confcontraseña': forms.PasswordInput(attrs={'class': 'form-control', 'id': 'confirm-password'}),
+        }
+        labels = {
+            'nom_usu': 'Nombre de Usuario',
+            'correo': 'Email',
+            'finca': 'Nombre de Finca',
+            'contraseña': 'Contraseña',
+            'confcontraseña': 'Confirmar Contraseña',
+        }
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        contraseña = cleaned_data.get('contraseña')
+        confcontraseña = cleaned_data.get('confcontraseña')
+        
+        if contraseña and confcontraseña and contraseña != confcontraseña:
+            raise ValidationError("Las contraseñas no coinciden")
+        else:
+            # Marcar que las contraseñas coinciden para el método save
+            self.instance._passwords_matched = True
+        
+        return cleaned_data
+    
+    def clean_correo(self):
+        correo = self.cleaned_data.get('correo')
+        if Administrador.objects.filter(correo=correo).exists():
+            raise ValidationError("Este correo electrónico ya está registrado")
+        return correo
+
+    def clean_nom_usu(self):
+        nom_usu = self.cleaned_data.get('nom_usu')
+        if Administrador.objects.filter(nom_usu=nom_usu).exists():
+            raise ValidationError("Este nombre de usuario ya está en uso")
+        return nom_usu
+
+    def clean_contraseña(self):
+        contraseña = self.cleaned_data.get('contraseña')
+        if len(contraseña) < 8:
+            raise ValidationError("La contraseña debe tener al menos 8 caracteres")
+        
+        # Puedes añadir más validaciones aquí si lo necesitas
+        # Por ejemplo, validar que tenga mayúsculas, minúsculas, números, etc.
+        
+        return contraseña
+    
+    def clean_finca(self):
+        finca = self.cleaned_data.get('finca')
+        if len(finca) < 2:
+            raise ValidationError("El nombre de la finca debe tener al menos 2 caracteres")
+        return finca

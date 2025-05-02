@@ -1,0 +1,85 @@
+{% extends "Base3.html" %}
+{% load static %}
+{% block titulo %} Mundo Bovino {% endblock %}
+{% block css %}
+<link href="{% static 'css/privacidad.css' %}" rel="stylesheet">
+{% endblock %}
+{% block contenido %} {% endblock %}
+
+{% block main %}
+{% if messages %}
+    <div class="mensajes-container">
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">
+                {{ message }}
+                <button type="button" class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+    <div class="perfil-container">
+        <form method="POST" action="{% url 'privacidad' %}" id="cambio-contraseña-form">
+            {% csrf_token %}
+            <div class="form-section">
+                <div class="campo-grupo">
+                    <label for="contraseña_actual">Contraseña Actual</label>
+                    <div class="input-con-icono">
+                        <input type="password" class="form-control" id="contraseña_actual" name="contraseña_actual" required>
+                        <span class="edit-icon"><i class="fas fa-edit"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-section">
+                <div class="campo-grupo">
+                    <label for="nueva_contraseña">Nueva Contraseña</label>
+                    <div class="input-con-icono">
+                        <input type="password" class="form-control" id="nueva_contraseña" name="nueva_contraseña" required>
+                        <span class="edit-icon"><i class="fas fa-edit"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-section">
+                <div class="campo-grupo">
+                    <label for="confirmar_contraseña">Confirmar Nueva Contraseña</label>
+                    <div class="input-con-icono">
+                        <input type="password" class="form-control" id="confirmar_contraseña" name="confirmar_contraseña" required>
+                        <span class="edit-icon"><i class="fas fa-edit"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="button-container">
+                <button type="submit" class="save-button">Guardar cambios</button>
+            </div>
+        </form>
+        
+        <!-- Modal de Bootstrap -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">¡Alerta!</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Contenido del modal -->
+                        <p>¿Estás seguro que desea guardar los cambios realizados?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn" onclick="document.getElementById('cambio-contraseña-form').submit();">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if messages %}
+        <div class="mensajes-container">
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} mt-3">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,832 @@
+{% load static from static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MundoBovino</title>
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/faq.css' %}" rel="stylesheet">
+</head>
+
+<body class="body">
+    <!-- Mensajes de alerta -->
+    <div class="mensajes-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    
+    <div>
+        <header>
+            <img src="{% static 'img/logo1.png' %}" alt="logo1" id="logo1"> 
+        </header>
+    </div>
+    <div>
+        <main>
+            <button id="home" onclick="window.location.href='{% url 'home' %}';">
+                <img src="{% static 'img/home2.png' %}" alt="home" class="home-icon">
+            </button>
+            <h2 class="text-center mb-4">Preguntas Frecuentes</h2>
+            <div class="container">
+                <h5>Acceso al Sistema</h5>
+                <div class="carousel-container">
+                    <div id="carouselAcceso" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Cómo puedo registrarme en el sistema?</h6>
+                                                <p class="card-text">Para registrarte en Mundo Bovino, sigue estos pasos: ...</p>
+                                                <button class="vermas" data-bs-toggle="modal"
+                                                    data-bs-target="#modalregistro">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Qué hacer si olvidé mi contraseña?</h6>
+                                                <p class="card-text">Si olvido su contraseña, puedes recuperarla siguiendo estos pasos: ...</p>
+                                                <button class="vermas" data-bs-toggle="modal"
+                                                    data-bs-target="#modalolvidocontraseña">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Cómo cambio mi información de contacto?</h6>
+                                                <p class="card-text">Para actualizar tu información de contacto en MundoBovino: ...</p>
+                                                <button class="vermas" data-bs-toggle="modal"
+                                                    data-bs-target="#modalcontacto">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Cómo cambiar mi contraseña?</h6>
+                                                <p class="card-text">Para cambiar tu contraseña en MundoBovino: ...</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="#modalcontraseña">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselAcceso"
+                            data-bs-slide="prev" id="carousel-control-prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Anterior</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselAcceso" data-bs-slide="next" id="carousel-control-next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Siguiente</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+                <h5>Inventario y Calendario</h5>
+                <div class="carousel-container">
+                    <div id="carouselRegistro1" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Cómo registro un nuevo animal en el sistema?
+                                                </h6>
+                                                <p class="card-text">Para registrar un nuevo animal en Mundo Bovino: ...</p>
+                                                <button class="vermas" data-bs-toggle="modal"
+                                                    data-bs-target="#modalnuevoanimal">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Cómo actualizo la información del ganado?</h6>
+                                                <p class="card-text">Para actualizar la información de un animal: ...</p>
+                                                <button class="vermas" data-bs-toggle="modal"
+                                                    data-bs-target="#modalpeso">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Es posible registrar eventos como vacunaciones o tratamientos médicos?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="#modalvacunacion">Ver
+                                                    Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title"></h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Cómo puedo generar un reporte de todo mi inventario ganadero?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="#modalreporte">Ver
+                                                    Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Cómo doy de baja a un animal por venta o muerte?
+                                                </h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="">Ver
+                                                    Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Qué tipos de documentos puedo cargar al sistema?
+                                                </h6>
+                                                <p class="card-text">Mundo Bovino permite cargar los siguientes tipos de documentos: ...</p>
+                                                <button class="vermas" data-bs-toggle="modal"
+                                                    data-bs-target="#modaldocumento">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Cómo filtrar los animales por raza, edad, etc?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="">Ver
+                                                    Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselRegistro1"
+                            data-bs-slide="prev" id="carousel-control-prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Anterior</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselRegistro1"
+                            data-bs-slide="next" id="carousel-control-next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Siguiente</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+                <h5>Registro de compras y ventas</h5>
+                <div class="carousel-container">
+                    <div id="carouselRegistrov" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Cómo registro la venta de un animal?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal"
+                                                    data-bs-target="#modalventa">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Puedo generar facturas automáticamente?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal"
+                                                    data-bs-target="">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Es posible ver el historial de ventas por
+                                                    cliente?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal"
+                                                    data-bs-target="">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Se actualiza automaticamente el inventario
+                                                    cuando registro una venta?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal"
+                                                    data-bs-target="">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Cómo registro la compra de nuevos animales?</h6>
+                                                <p class="card-text">Para registrar una transaccion de compra, realiza los siquientes pasos: ...</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="#modalcompra">Ver
+                                                    Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Cómo cargo los comprobantes o facturas de mis compras?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="">Ver
+                                                    Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Hay limite de tamaño para los documentos que subo?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal"
+                                                    data-bs-target="">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Cómo organizo los documentos por categorías?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselRegistrov"
+                            data-bs-slide="prev" id="carousel-control-prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Anterior</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselRegistrov"
+                            data-bs-slide="next" id="carousel-control-next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Siguiente</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+                <h5>Contactos importantes y documentos</h5>
+                <div class="carousel-container">
+                    <div id="carouselContactos" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Cómo agrego un nuevo contacto al sistema?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="">Ver
+                                                    Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Puedo categorizar mis contactos (veterinarios, proveedores, clientes)?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Es posible vincular contactos a transacciones específicas?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Cómo actualizo la información de un contacto existente?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Puedo compartir documentos con otros usuarios o exportarlos?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Están protegidos mis documentos?¿Quién puede acceder a ellos?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Cómo recupero un documento que eliminé por error?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="#modaldocumento">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Puedo exportar mi lista de contactos?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselContactos"
+                            data-bs-slide="prev" id="carousel-control-prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Anterior</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselContactos"
+                            data-bs-slide="next" id="carousel-control-next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Siguiente</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container">
+                <h5>Contactos de Soporte</h5>
+                <div class="carousel-container">
+                    <div id="carouselSoporte" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿El sistema me permite enviar notificaciones a mis contactos?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="">Ver Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Qué navegadores son compatibles con el sistema?</h6>
+                                                <p class="card-text">texto</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="">Ver
+                                                    Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">¿Cuáles son los tiempos de respuesta?</h6>
+                                                <p class="card-text">Estos son los tiempos estipulados de respuesta son: ...</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="#modaltiempo">Ver
+                                                    Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">Formulario de soporte</h6>
+                                                <p class="card-text">Este formulario te ayudará a explicar el error o problema que tienes con la plataforma</p>
+                                                <button class="vermas" data-bs-toggle="modal" data-bs-target="#modalformulario">Ver
+                                                    Más</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselSoporte"
+                            data-bs-slide="prev" id="carousel-control-prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Anterior</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselSoporte"
+                            data-bs-slide="next" id="carousel-control-next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Siguiente</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div>
+        <footer>
+
+        </footer>
+    </div>
+
+    <!-- Modales para cada tarjeta -->
+    <!-- Modal 1: Registro en el sistema -->
+    <div class="modal fade" id="modalregistro" tabindex="-1" aria-labelledby="modalLabel1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel1">¿Cómo puedo registrarme en el sistema?</h5>
+                </div>
+                <div class="modal-body">
+                    <ol>
+                        <li>Ingresa a la página principal y haz clic en el botón "Registrarse"</li>
+                        <li>Completa el formulario con tus datos personales y de contacto</li>
+                        <li>Crea una contraseña segura (mínimo 8 caracteres, debe incluir letras y números)</li>
+                        <li>Haz clic en "Crear cuenta"</li>
+                        <li>Revisa tu correo electrónico para confirmar tu cuenta</li>
+                    </ol>
+                    <p>Si tienes problemas con el registro, contacta a soporte técnico.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Olvidé mi contraseña -->
+    <div class="modal fade" id="modalolvidocontraseña" tabindex="-1" aria-labelledby="modalLabel2" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel2">¿Qué hacer si olvidé mi contraseña?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ol>
+                        <li>En la pantalla de inicio de sesión, haz clic en "¿Olvidaste tu contraseña?"</li>
+                        <li>Ingresa el correo electrónico asociado a tu cuenta</li>
+                        <li>Haz clic en "Enviar enlace de recuperación"</li>
+                        <li>Revisa tu correo electrónico (incluyendo la carpeta de spam)</li>
+                        <li>Haz clic en el enlace de recuperación que te enviamos</li>
+                        <li>Crea una nueva contraseña</li>
+                    </ol>
+                    <p>El enlace de recuperación tiene una validez de 24 horas.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 3: Cambio de información de contacto -->
+    <div class="modal fade" id="modalcontacto" tabindex="-1" aria-labelledby="modalLabel3" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel3">¿Cómo cambio mi información de contacto?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ol>
+                        <li>Inicia sesión en tu cuenta</li>
+                        <li>Haz clic en tu nombre de la finca en la esquina superior derecha</li>
+                        <li>Selecciona "Configuraciones" en el menú desplegable</li>
+                        <li>En la sección "perfil", actualiza tus datos de contacto</li>
+                        <li>Haz clic en "Guardar cambios"</li>
+                    </ol>
+                    <p>Recuerda mantener tu información de contacto actualizada para recibir notificaciones importantes.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 4 -->
+    <div class="modal fade" id="modalcontraseña" tabindex="-1" aria-labelledby="modalLabel4" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel4">¿Cómo cambiar tu contraseña?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ol>
+                        <li>Inicia sesión en tu cuenta</li>
+                        <li>Haz clic en tu nombre de la finca en la esquina superior derecha</li>
+                        <li>Selecciona "Configuraciones" en el menú desplegable</li>
+                        <li>En la sección "Privacidad", completa los campos solicitados</li>
+                        <li>Haz clic en "Guardar cambios"</li>
+                    </ol>
+                    <p>Si tienes problemas con el cambio de contraseña, contacta a soporte técnico.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 5: Registro de nuevo animal -->
+    <div class="modal fade" id="modalnuevoanimal" tabindex="-1" aria-labelledby="modalLabel5" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel5">¿Cómo registro un nuevo animal en el sistema?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ol>
+                        <li>Inicia sesión en tu cuenta</li>
+                        <li>Ve a la sección "Inventario" en el menú principal</li>
+                        <li>Haz clic en el botón "Añadir animal"</li>
+                        <li>Completa los campos requeridos (raza, edad, etc.)</li>
+                        <li>Agrega información adicional como peso inicial y características específicas</li>
+                        <li>Haz clic en "Guardar" para finalizar el registro</li>
+                    </ol>
+                    <p>Cada animal debe tener un identificador único en el sistema.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 6: Actualización de peso/salud -->
+    <div class="modal fade" id="modalpeso" tabindex="-1" aria-labelledby="modalLabel6" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel6">¿Cómo actualizo el peso o estado de salud del ganado?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ol>
+                        <li>Inicia sesión en tu cuenta</li>
+                        <li>Ve a la sección "Inventario" en el menú principal</li>
+                        <li>Busca el animal que deseas actualizar usando el buscador o filtros</li>
+                        <li>Haz clic en el animal para ver su ficha completa</li>
+                        <li>Selecciona la el icono de editar</li>
+                        <li>Ingresa los nuevos datos en los campos necesarios</li>
+                        <li>Haz clic en "Guardar"</li>
+                    </ol>
+                    <p>El sistema mantendrá un historial de todos los registros para análisis futuros.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 7: Tipos de documentos -->
+    <div class="modal fade" id="modaldocumento" tabindex="-1" aria-labelledby="modalLabel7" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel7">¿Qué tipos de documentos puedo cargar al sistema?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul>
+                        <li><strong>Certificados sanitarios</strong>: Documentos oficiales de vacunación o tratamientos
+                        </li>
+                        <li><strong>Guías de traslado</strong>: Permisos para movilizar el ganado</li>
+                        <li><strong>Facturas de compra/venta</strong>: Comprobantes de transacciones</li>
+                        <li><strong>Reportes veterinarios</strong>: Diagnósticos y tratamientos realizados</li>
+                        <li><strong>Análisis de laboratorio</strong>: Resultados de pruebas y exámenes</li>
+                        <li><strong>Fotografías</strong>: Imágenes del animal para identificación</li>
+                    </ul>
+                    <p>Formatos aceptados: PDF, JPG, PNG (máximo 10MB por archivo)</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 8: Registro de venta/compra -->
+    <div class="modal fade" id="modalcompra" tabindex="-1" aria-labelledby="modalLabel8" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel8">¿Cómo registro la venta?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Para registrar una transacción de compra:</p>
+                    <ol>
+                        <li>Inicia sesión en tu cuenta</li>
+                        <li>Ve a la sección "Compras" en el menú principal</li>
+                        <li>Haz clic en "agregar compra"</li>
+                        <li>completa la información de los nuevos animales</li>
+                        <li>Ingresa los detalles de la transacción (fecha, monto, comprador)</li>
+                        <li>Haz clic en "Finalizar transacción"</li>
+                    </ol>
+                    <p>El sistema actualizará automáticamente tu inventario después de completar la transacción.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalventa" tabindex="-1" aria-labelledby="modalLabel8" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel8">¿Cómo registro la venta?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Para registrar una transacción de venta:</p>
+                    <ol>
+                        <li>Inicia sesión en tu cuenta</li>
+                        <li>Ve a la sección "Ventas" en el menú principal</li>
+                        <li>Haz clic en "agregar Venta"</li>
+                        <li>completa la información de los animales de la venta</li>
+                        <li>Ingresa los detalles de la transacción (fecha, monto, comprador)</li>
+                        <li>Haz clic en "Finalizar transacción"</li>
+                    </ol>
+                    <p>El sistema actualizará automáticamente tu inventario después de completar la transacción.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modaltiempo" tabindex="-1" aria-labelledby="modalLabel8" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel8">Tiempos de respuesta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ol>
+                        <li><strong>Problemas críticos (sistema caído, pérdida de datos)</strong>: 1-2 horas laborales</li>
+                        <li><strong>Problemas importantes (funcionalidades principales afectadas)</strong>: 4-8 horas laborales</li>
+                        <li><strong>Consultas generales</strong>: 24-48 horas laborales</li>
+                    </ol>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalformulario" tabindex="-1" aria-labelledby="modalLabel8" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel8">Formulario de soporte</h5>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="nombreCompleto" class="form-label">Nombre completo</label>
+                            <input type="text" class="form-control" id="nombreCompleto" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email de contacto</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="asunto" class="form-label">Asunto</label>
+                            <input type="asunto" class="form-control" id="asunto" required>
+                            
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción detallada del problema</label>
+                            <textarea class="form-control" id="descripcion" rows="5" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="urgencia" class="form-label">Nivel de urgencia</label>
+                            <select class="form-select" id="urgencia">
+                                <option value="Selecciona" selected disabled>Seleccione una opción</option>
+                                <option value="critico">Crítico</option>
+                                <option value="media" selected>Importante</option>
+                                <option value="alta">Generales</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="adjuntos" class="form-label">Adjuntar capturas de pantalla (hasta 3 archivos)</label>
+                            <input class="form-control" type="file" id="adjuntos" multiple accept="image/*" max="3">
+                            <div class="form-text">Formatos aceptados: JPG, PNG, GIF</div>
+                        </div>
+                        <div id="image-preview" class="mt-2 d-flex flex-wrap"></div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Enviar solicitud</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    document.getElementById('adjuntos').addEventListener('change', function(event) {
+        const previewContainer = document.getElementById('image-preview');
+        previewContainer.innerHTML = '';
+        
+        if (this.files.length > 3) {
+            alert('Solo puedes subir hasta 3 archivos');
+            this.value = '';
+            return;
+        }
+        
+        Array.from(this.files).forEach(file => {
+            if (file.type.match('image.*')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'img-thumbnail me-2 mb-2';
+                    img.style.maxHeight = '100px';
+                    previewContainer.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+    </script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,451 @@
+{% extends "Base2.html" %}
+{% load static %}
+{% block titulo %} Mundo Bovino {% endblock %}
+{% block css %}
+<link href="{% static 'css/calendario.css' %}" rel="stylesheet">
+{% endblock %}
+{% block contenido %} {% endblock %}
+
+{% block main %}
+{% if messages %}
+    <div class="mensajes-container">
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">
+                {{ message }}
+                <button type="button" class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="container mt-2">
+    <!-- Búsqueda por filtrado-->
+    <div class="filtrado-container">
+        <form method="get" class="form-filtrado">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <ul class="nav nav-tabs" id="navbar">
+                        <li class="nav-item dropdown">
+                            <button class="dropdown-toggle" id="toggle" type="button"
+                                    data-bs-toggle="dropdown"
+                                    role="button"><b>
+                                        <img src="{% static 'img/filtrar.png' %}" alt="filtrar">
+                                        {{ request.GET.tipo_filtro|default:"Filtrar por" }}
+                                    </b>
+                                </button>
+                            <div class="dropdown-menu" id="dropdown-filtrar">
+                                <div class="divider">
+                                    <a class="dropdown-item" id="dropdown-item" href="?{% if request.GET.busqueda %}busqueda={{ request.GET.busqueda }}&{% endif %}tipo_filtro=Todos{% if request.GET.month %}&month={{ request.GET.month }}{% endif %}">
+                                        <b>Todos</b>
+                                    </a>
+                                </div>
+                                <div class="divider">
+                                    <a class="dropdown-item" id="dropdown-item" href="?{% if request.GET.busqueda %}busqueda={{ request.GET.busqueda }}&{% endif %}tipo_filtro=Evento{% if request.GET.month %}&month={{ request.GET.month }}{% endif %}">
+                                        <b>Evento</b>
+                                    </a>
+                                    <a class="dropdown-item" id="dropdown-item" href="?{% if request.GET.busqueda %}busqueda={{ request.GET.busqueda }}&{% endif %}tipo_filtro=Tarea{% if request.GET.month %}&month={{ request.GET.month }}{% endif %}">
+                                        <b>Tarea</b>
+                                    </a>
+                                </div>
+                                <a class="dropdown-item" id="dropdown-item" href="?{% if request.GET.busqueda %}busqueda={{ request.GET.busqueda }}&{% endif %}tipo_filtro=Pendiente{% if request.GET.month %}&month={{ request.GET.month }}{% endif %}">
+                                    <b>Pendiente</b>
+                                </a>
+                                <a class="dropdown-item" id="dropdown-item" href="?{% if request.GET.busqueda %}busqueda={{ request.GET.busqueda }}&{% endif %}tipo_filtro=Reprogramada{% if request.GET.month %}&month={{ request.GET.month }}{% endif %}">
+                                    <b>Reprogramada</b>
+                                </a>
+                                <a class="dropdown-item" id="dropdown-item" href="?{% if request.GET.busqueda %}busqueda={{ request.GET.busqueda }}&{% endif %}tipo_filtro=Cancelada{% if request.GET.month %}&month={{ request.GET.month }}{% endif %}">
+                                    <b>Cancelada</b>
+                                </a>
+                                <a class="dropdown-item" id="dropdown-item" href="?{% if request.GET.busqueda %}busqueda={{ request.GET.busqueda }}&{% endif %}tipo_filtro=Realizada{% if request.GET.month %}&month={{ request.GET.month }}{% endif %}">
+                                    <b>Realizada</b>
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- filtros actuales de mes/año -->
+            {% if request.GET.month %}
+                <input type="hidden" name="month" value="{{ request.GET.month }}">
+            {% endif %}
+            {% if request.GET.tipo_filtro %}
+                <input type="hidden" name="tipo_filtro" value="{{ request.GET.tipo_filtro }}">
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Ventana emergente para resultados de búsqueda -->
+    {% if resultados_busqueda %}
+    <div class="search-results-popup" >
+        
+        <div class="search-results-content">
+            <a href="{% url 'calendario' %}" class="close-search-popup">&times;</a>
+
+            <div class="search-results-title">
+                Resultados para: {{ request.GET.busqueda|default:'' }}
+                {% if request.GET.tipo_filtro %} {{ request.GET.tipo_filtro }}{% endif %}
+            </div>
+        
+            {% if resultados_busqueda %}
+                <div class="search-results-grid">
+                    {% for evento in resultados_busqueda %}
+                        <div class="event-display-container">
+                            <div class="event-card tipo-{{ evento.tipo }} {% if evento.estado == 'Realizada' %}estado-realizado{% endif %}">
+                                <h4>{{ evento.tipo }}</h4>
+                                <p class="event-time">{{ evento.fecha|date:"d/m/Y" }} - {{ evento.hora }}</p>
+                                <p class="event-location">Estado: {{ evento.estado }}</p>
+                                <p class="event-details">{{ evento.descripcion }}</p>
+                                <div class="event-actions">
+                                    <a href="?dia={{ evento.fecha.day }}&mes={{ evento.fecha.month }}&año={{ evento.fecha.year }}&evento={{ evento.cod_age }}&mostrar_formulario_editar=True" class="btn-editar">
+                                        <img src="{% static 'img/editar.png' %}" alt="editar">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-results-message">
+                    <p>No se encontraron resultados para tu búsqueda.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Contenedor principal que divide el panel de eventos y el calendario -->
+    <div class="calendar-container">
+      <!-- Wrapper para el calendario -->
+      <div class="calendar-wrapper">
+          <div class="calendar" id="calendar">
+              <!-- Navegación mensual -->
+              <div class="calendar-header">
+                  <form method="get" style="display:inline;">
+                      <input type="hidden" name="month" value="{{ mes_anterior }}">
+                      <button type="submit" class="btn-prev">
+                          <img src="{% static 'img/prev.png' %}" alt="prev" id="prev">
+                      </button>
+                  </form>
+                  <h5>{{ nombre_mes }} {{ año_actual }}</h5>
+                  <form method="get" style="display:inline;">
+                      <input type="hidden" name="month" value="{{ mes_siguiente }}">
+                      <button type="submit" class="btn-next">
+                          <img src="{% static 'img/next.png' %}" alt="next" id="next">
+                      </button>
+                  </form>
+              </div>
+              
+              <!-- Leyenda de eventos -->
+              <div class="contenedor">
+                  <div class="col-3">
+                      <ul id="evento">
+                          <li>Evento</li>
+                      </ul>
+                  </div>
+                  <div class="col-3">
+                      <ul id="tarea">
+                          <li>Tarea</li>
+                      </ul>
+                  </div>
+                  <div class="col-3">
+                      <ul id="completado">
+                          <li>Completado</li>
+                      </ul>
+                  </div>                 
+              </div>
+              
+              <!-- Tabla del calendario -->
+              <table>
+                  <thead>
+                      <tr>
+                          <td>Lu</td>
+                          <td>Ma</td>
+                          <td>Mi</td>
+                          <td>Ju</td>
+                          <td>Vi</td>
+                          <td>Sa</td>
+                          <td>Do</td>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% for semana in calendario_mensual %}
+                          <tr>
+                              {% for dia in semana %}
+                                  {% if dia is None %}
+                                      <td class="empty-cell"></td>
+                                  {% else %}
+                                      {% with month=dia.fecha.month day=dia.fecha.day %}
+                                          <!-- Verificar si el día está en el periodo de vacunación -->
+                                          {% if month == 5 and day >= 15 or month == 6 and day <= 15 or month == 11 and day >= 15 or month == 12 and day <= 15 %}
+                                              <td class="{% if dia.fecha == fecha_actual %}current-day{% endif %} {% if dia.tipo_evento %}has-event-{{ dia.tipo_evento }}{% endif %} {% if dia.tiene_evento_completado %}has-event-completado{% endif %} vaccination-period">
+                                          {% else %}
+                                              <td class="{% if dia.fecha == fecha_actual %}current-day{% endif %} {% if dia.tipo_evento %}has-event-{{ dia.tipo_evento }}{% endif %} {% if dia.tiene_evento_completado %}has-event-completado{% endif %}">
+                                          {% endif %}
+                                              <a href="?dia={{ dia.fecha.day }}&mes={{ dia.fecha.month }}&año={{ dia.fecha.year }}" class="day-number {% if dia.fecha == fecha_actual %}highlight-circle{% endif %}">
+                                                  {{ dia.fecha.day }}
+                                              </a>
+                                          </td>
+                                      {% endwith %}
+                                  {% endif %}
+                              {% endfor %}
+                          </tr>
+                      {% endfor %}
+                  </tbody>
+              </table>
+          </div> <!-- Fin del calendario -->
+      </div>
+
+      <!-- Panel derecho para mostrar eventos -->
+    <div id="events-list" class="{% if eventos_del_dia|length == 1 %}single-event{% elif eventos_del_dia|length > 1 %}multiple-events{% endif %}">
+        <!-- Botón agregar evento -->
+        <div class="add-event-button">
+            {% if fecha_seleccionada %}
+                <a href="?dia={{ fecha_seleccionada.day }}&mes={{ fecha_seleccionada.month }}&año={{ fecha_seleccionada.year }}&mostrar_formulario=True" class="btn-agregar">
+                    <img src="{% static 'img/agregar.png' %}" class="agregar" alt="agregar">
+                </a>
+            {% else %}
+                <a href="?dia={{ fecha_actual.day }}&mes={{ fecha_actual.month }}&año={{ fecha_actual.year }}&mostrar_formulario=True" class="btn-agregar">
+                    <img src="{% static 'img/agregar.png' %}" class="agregar" alt="agregar">
+                </a>
+            {% endif %}
+        </div>
+        
+        <!-- Contenido del panel de eventos -->
+        {% if eventos_del_dia %}
+            <!-- Mostrar todos los eventos del día seleccionado -->
+            {% for evento in eventos_del_dia %}
+                <div class="event-display-container">
+                    <div class="event-image-container">
+                        <img src="{% static 'img/imagen.png' %}" alt="imagen">
+                    </div>
+                    <div class="event-card tipo-{{ evento.tipo }} {% if evento.estado == 'Realizada' %}estado-realizado{% endif %}">
+                        <h4>{{ evento.tipo }}</h4>
+                        <p class="event-time">{{ evento.fecha|date:"d/m/Y" }} - {{ evento.hora }}</p>
+                        <p class="event-location">Estado: {{ evento.estado }}</p>
+                        <p class="event-details">{{ evento.descripcion }}</p>
+                        <div class="event-actions">
+                            <a href="?dia={{ evento.fecha.day }}&mes={{ evento.fecha.month }}&año={{ evento.fecha.year }}&evento={{ evento.cod_age }}&mostrar_formulario_editar=True" class="btn-editar">
+                                <img src="{% static 'img/editar.png' %}" alt="editar">
+                            </a>
+                            <!-- Botón para eliminar evento -->
+                            <form action="{% url 'eliminar_evento' evento.cod_age %}" method="POST" id="delete-form-{{ evento.cod_age }}">
+                                {% csrf_token %}
+                                <button type="button" class="btn-eliminar" onclick="document.getElementById('confirmDeleteModal-{{ evento.cod_age }}').style.display='flex'">
+                                    <img src="{% static 'img/eliminar.png' %}" alt="eliminar" width="20">
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Modal de confirmación personalizado -->
+                <div id="confirmDeleteModal-{{ evento.cod_age }}" class="custom-modal">
+                    <div class="custom-modal-content">
+                        <div class="custom-modal-header">
+                            <h3>Confirmar eliminación</h3>
+                        </div>
+                        <div class="custom-modal-body">
+                            <p>¿Estás seguro de eliminar este {{ evento.tipo }} con estado {{ evento.estado}}?</p>
+                        </div>
+                        <div class="custom-modal-footer">
+                            <button type="button" class="btn-cancelar" onclick="document.getElementById('confirmDeleteModal-{{ evento.cod_age }}').style.display='none'">Cancelar</button>
+                            <button type="button" class="btn-confirmar" onclick="document.getElementById('delete-form-{{ evento.cod_age }}').submit()">Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% elif evento_seleccionado %}
+            <!-- Mostrar el evento seleccionado cuando no hay múltiples eventos -->
+            <div class="event-display-container">
+                <div class="event-image-container">
+                    <img src="{% static 'img/imagen.png' %}" alt="imagen">
+                </div>
+                <div class="event-card tipo-{{ evento_seleccionado.tipo }} {% if evento_seleccionado.estado == 'Realizada' %}estado-realizado{% endif %}">
+                    <h4>{{ evento_seleccionado.tipo }}</h4>
+                    <p class="event-time">{{ evento_seleccionado.fecha|date:"d/m/Y" }} - {{ evento_seleccionado.hora }}</p>
+                    <p class="event-location">Estado: {{ evento_seleccionado.estado }}</p>
+                    <p class="event-details">{{ evento_seleccionado.descripcion }}</p>
+                    <div class="event-actions">
+                        <a href="?dia={{ evento_seleccionado.fecha.day }}&mes={{ evento_seleccionado.fecha.month }}&año={{ evento_seleccionado.fecha.year }}&evento={{ evento_seleccionado.cod_age }}&mostrar_formulario_editar=True" class="btn-editar">
+                            <img src="{% static 'img/editar.png' %}" alt="editar">
+                        </a>
+                        <!-- Botón para eliminar evento -->
+                        <form action="{% url 'eliminar_evento' evento_seleccionado.cod_age %}" method="POST" id="delete-form-{{ evento_seleccionado.cod_age }}">
+                            {% csrf_token %}
+                            <button type="button" class="btn-eliminar" onclick="document.getElementById('confirmDeleteModal-{{ evento_seleccionado.cod_age }}').style.display='flex'">
+                                <img src="{% static 'img/eliminar.png' %}" alt="eliminar" width="20">
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Modal de confirmación para el evento seleccionado -->
+                <div id="confirmDeleteModal-{{ evento_seleccionado.cod_age }}" class="custom-modal">
+                    <div class="custom-modal-content">
+                        <div class="custom-modal-header">
+                            <h3>Confirmar eliminación</h3>
+                        </div>
+                        <div class="custom-modal-body">
+                            <p>¿Estás seguro de eliminar este {{ evento.tipo }} con estado "{{ evento.estado }}"?</p>
+                        </div>
+                        <div class="custom-modal-footer">
+                            <button type="button" class="btn-cancelar" onclick="document.getElementById('confirmDeleteModal-{{ evento_seleccionado.cod_age }}').style.display='none'">Cancelar</button>
+                            <button type="button" class="btn-confirmar" onclick="document.getElementById('delete-form-{{ evento_seleccionado.cod_age }}').submit()">Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <!-- Mostrar mensaje cuando no hay eventos seleccionados -->
+            <div class="empty-events-panel">
+                <i class="fa fa-calendar-o"></i>
+                <p>No hay eventos seleccionados</p>
+                <p>Haz clic en un día para ver sus eventos o agregar uno nuevo</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Formulario para agregar evento -->
+    {% if fecha_seleccionada and mostrar_formulario or request.GET.mostrar_formulario %}
+      <div class="event-popup" style="display:block;">
+          <div class="event-popup-content">
+              <span class="close-popup" onclick="window.location.href='{% url 'calendario' %}';">&times;</span>
+              <form action="{% url 'agregar_evento' %}" method="post">
+                  {% csrf_token %}
+                  <div class='calander_popip_title'>
+                      <i class="fa fa-calendar" aria-hidden="true"></i> 
+                      <!-- Mostrar la fecha seleccionada -->
+                      {% if request.GET.dia and request.GET.mes and request.GET.año %}
+                          <span id="selected-date">Agregar Evento - {{ request.GET.dia }}/{{ request.GET.mes }}/{{ request.GET.año }}</span>
+                      {% elif fecha_seleccionada %}
+                          <span id="selected-date">Agregar Evento - {{ fecha_seleccionada|date:"d/m/Y" }}</span>
+                      {% else %}
+                          <span id="selected-date">Agregar Evento - {{ fecha_actual|date:"d/m/Y" }}</span>
+                      {% endif %}
+                  </div>
+                  <ul>
+                      <div>
+                          <label for="fecha"><i class="fa fa-calendar-o" aria-hidden="true"></i>Fecha</label>
+                          <!-- Establecer valor de fecha basado en parámetros GET o fecha seleccionada -->
+                          {% if request.GET.dia and request.GET.mes and request.GET.año %}
+                              {% with year=request.GET.año|add:"0" month=request.GET.mes|add:"0" day=request.GET.dia|add:"0" %}
+                                  <input id="fecha" class='form-control' type="date" name="fecha" 
+                                  value="{{ year }}-{% if month < 10 %}0{% endif %}{{ month }}-{% if day < 10 %}0{% endif %}{{ day }}" required/>
+                              {% endwith %}
+                          {% elif fecha_seleccionada %}
+                              <input id="fecha" class='form-control' type="date" name="fecha" value="{{ fecha_seleccionada|date:'Y-m-d' }}" required/>
+                          {% else %}
+                              <input id="fecha" class='form-control' type="date" name="fecha" value="{{ fecha_actual|date:'Y-m-d' }}" required/>
+                          {% endif %}
+                      </div>
+                      <div>
+                          <label for="hora"><i class="fa fa-clock-o" aria-hidden="true"></i>Hora</label>
+                          <input id="hora" class='form-control' type="time" name="hora" required/>
+                      </div>
+                      <div class="mb-3">
+                          <label for="tipo" class="form-label">Tipo:</label>
+                          <select class="form-select" id="tipo" name="tipo" required>
+                              <option value="" disabled selected>Selecciona una opción</option>
+                              <option value="Tarea">Tarea</option>
+                              <option value="Evento">Evento</option>
+                          </select>
+                      </div>    
+                      <div class="mb-3">
+                          <label for="estado" class="form-label">Estado:</label>
+                          <select class="form-select" id="estado" name="estado" required>
+                              <option value="" disabled selected>Selecciona una opción</option>
+                              <option value="Pendiente">Pendiente</option>
+                              <option value="Reprogramada">Reprogramada</option>
+                              <option value="Cancelada">Cancelada</option>
+                              <option value="Realizada">Realizada</option>
+                          </select>
+                      </div>    
+                      <div>
+                          <label for="descripcion"><i class="fa fa-info-circle" aria-hidden="true"></i>Descripción</label>
+                          <textarea id="descripcion" class='form-control' name="descripcion" required></textarea>
+                      </div>
+                      
+                      <!-- Campos ocultos para redireccionar correctamente después de enviar el formulario -->
+                      {% if request.GET.dia and request.GET.mes and request.GET.año %}
+                          <input type="hidden" name="redirect_fecha" value="{{ request.GET.dia }}">
+                          <input type="hidden" name="redirect_mes" value="{{ request.GET.mes }}">
+                          <input type="hidden" name="redirect_año" value="{{ request.GET.año }}">
+                      {% elif fecha_seleccionada %}
+                          <input type="hidden" name="redirect_fecha" value="{{ fecha_seleccionada.day }}">
+                          <input type="hidden" name="redirect_mes" value="{{ fecha_seleccionada.month }}">
+                          <input type="hidden" name="redirect_año" value="{{ fecha_seleccionada.year }}">
+                      {% else %}
+                          <input type="hidden" name="redirect_fecha" value="{{ fecha_actual.day }}">
+                          <input type="hidden" name="redirect_mes" value="{{ fecha_actual.month }}">
+                          <input type="hidden" name="redirect_año" value="{{ fecha_actual.year }}">
+                      {% endif %}
+                      
+                      <div class="button">
+                          <input type="submit" class='form-control submit_btn' value="Guardar"/>
+                          <a href="{% url 'calendario' %}" class="form-control cancel-btn">Cancelar</a>
+                      </div>
+                  </ul>
+              </form>
+          </div>
+      </div>
+    {% endif %}
+
+    <!-- Formulario para editar evento -->
+    {% if request.GET.mostrar_formulario_editar and evento_seleccionado %}
+      <div class="event-popup" style="display:block;">
+          <div class="event-popup-content">
+              <span class="close-popup" onclick="window.location.href='{% url 'calendario' %}?dia={{ fecha_seleccionada.day }}&mes={{ fecha_seleccionada.month }}&año={{ fecha_seleccionada.year }}';">&times;</span>
+              <form action="{% url 'editar_evento' evento_seleccionado.cod_age %}" method="post">
+                  {% csrf_token %}
+                  <div class='calander_popip_title'>
+                      <i class="fa fa-calendar" aria-hidden="true"></i> 
+                      <span id="selected-date">Editar Evento - {{ evento_seleccionado.fecha|date:"d/m/Y" }}</span>
+                  </div>
+                  <ul>
+                      <div>
+                          <label for="fecha"><i class="fa fa-calendar-o" aria-hidden="true"></i>Fecha</label>
+                          <input id="fecha" class='form-control' type="date" name="fecha" value="{{ evento_seleccionado.fecha|date:'Y-m-d' }}" required/>
+                      </div>
+                      <div>
+                          <label for="hora"><i class="fa fa-clock-o" aria-hidden="true"></i>Hora</label>
+                          <input id="hora" class='form-control' type="time" name="hora" value="{{ evento_seleccionado.hora|time:'H:i' }}" required/>
+                      </div>
+                      <div class="mb-3">
+                          <label for="tipo" class="form-label">Tipo:</label>
+                          <select class="form-select" id="tipo" name="tipo" required>
+                              <option value="Tarea" {% if evento_seleccionado.tipo == 'Tarea' %}selected{% endif %}>Tarea</option>
+                              <option value="Evento" {% if evento_seleccionado.tipo == 'Evento' %}selected{% endif %}>Evento</option>
+                          </select>
+                      </div>    
+                      <div class="mb-3">
+                          <label for="estado" class="form-label">Estado:</label>
+                          <select class="form-select" id="estado" name="estado" required>
+                              <option value="Pendiente" {% if evento_seleccionado.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                              <option value="Reprogramada" {% if evento_seleccionado.estado == 'Reprogramada' %}selected{% endif %}>Reprogramada</option>
+                              <option value="Cancelada" {% if evento_seleccionado.estado == 'Cancelada' %}selected{% endif %}>Cancelada</option>
+                              <option value="Realizada" {% if evento_seleccionado.estado == 'Realizada' %}selected{% endif %}>Realizada</option>
+                          </select>
+                      </div>    
+                      <div>
+                          <label for="descripcion"><i class="fa fa-info-circle" aria-hidden="true"></i>Descripción</label>
+                          <textarea id="descripcion" class='form-control' name="descripcion" required>{{ evento_seleccionado.descripcion }}</textarea>
+                      </div>
+                      
+                      <!-- Campos ocultos para redireccionar correctamente después de enviar el formulario -->
+                      <input type="hidden" name="redirect_fecha" value="{{ fecha_seleccionada.day }}">
+                      <input type="hidden" name="redirect_mes" value="{{ fecha_seleccionada.month }}">
+                      <input type="hidden" name="redirect_año" value="{{ fecha_seleccionada.year }}">
+                      
+                      <div class="button">
+                          <input type="submit" class='form-control submit_btn' value="Guardar cambios"/>
+                          <a href="{% url 'calendario' %}?dia={{ fecha_seleccionada.day }}&mes={{ fecha_seleccionada.month }}&año={{ fecha_seleccionada.year }}" class="form-control cancel-btn">Cancelar</a>
+                      </div>
+                  </ul>
+              </form>
+          </div>
+      </div>
+    {% endif %}
+
+</div> <!-- end container -->
+
+{% endblock %}

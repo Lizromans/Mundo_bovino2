@@ -1,0 +1,204 @@
+:root {
+    --color-fondo: #f8dfb3;
+    --color-primario: #D3B177;
+    --color-secundario: #947643;
+    --gradient-header: linear-gradient(90deg, rgba(211,177,119,1) 25%, rgba(109,92,62,1) 100%);
+}
+
+
+.mensajes-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    max-width: 500px;
+    z-index: 9999;
+    text-align: center;
+}
+
+.alert {
+    padding: 15px 20px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-weight: 500;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.alert-success {
+    background-color: #dff0d8;
+    border: 1px solid #d6e9c6;
+    color: #3c763d;
+}
+
+.alert-danger {
+    background-color: #f2dede;
+    border: 1px solid #ebccd1;
+    color: #a94442;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Opcion para cerrar el mensaje */
+.alert {
+    position: relative;
+    padding-right: 30px; /* Espacio para el botón */
+}
+
+.close-btn {
+    position: absolute;
+    top: 2px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: inherit;
+}
+
+.mensaje{
+    background-color: #D3B177;
+    box-shadow: 0 4px 6px rgba(0, 0, 0.3, 0.3);
+    height: 310px;
+    margin: 75px;
+    display: flex;
+    width: 500px;
+    border-radius: 30px;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    left: 10%; 
+    margin-top: 7%;
+    margin-bottom: 7%;
+}
+
+h1{
+    font-family: 'Courier New', Courier, monospace;
+    color: #000000;
+    font-style: oblique;
+    font-size: 17px;
+    display: flex;
+    position: absolute;
+    transform: translate(0%, 0%);
+    top: 30px;
+    left: 20px;
+    right: 20px;
+    justify-content: center;
+    text-align: center;
+}
+
+.autenticacion{
+    display: grid;
+    justify-content: center;
+    margin-top: 65px;
+    position: relative;
+    right: 33%;
+    font-family: 'BabelSans', 
+}
+
+#registro{
+    background-color: var(--color-primario);
+    height: 39px;
+    width: 170px;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0.3, 0.3);
+    margin-top: 27px;
+    color: #000000;
+    cursor: pointer;
+    margin-left: 155px;
+    border-color: #0e0b064b;
+}
+
+#registro:hover{
+    background-color: var(--color-secundario);
+    color: #ffffff;
+}
+
+#inicio{
+    background-color: #D3B177;
+    height: 39px;
+    width: 170px;
+    border-radius: 20px;
+    border-color: #0e0b064b;
+    box-shadow: 0 4px 6px rgba(0, 0, 0.3, 0.3);
+    margin-top: 27px;
+    color: #000000;
+    cursor: pointer;
+    margin-left: 155px;
+    
+}
+
+#inicio:hover{
+    background-color: #947643;
+    color: #ffffff;
+}
+
+/* Estilos para el carrusel */
+.carousel{
+    box-shadow: 0 4px 6px rgba(0, 0, 0.3, 0.3);
+    border-radius: 30px; 
+    display: flex;
+    height: 400px;
+    width: 450px;
+    margin-left: 560px;
+    z-index: -1;
+    position: absolute;
+    overflow: hidden;
+}
+
+.carousel-inner {
+    border-radius: 30px;
+    height: 100%;
+}
+
+.carousel-item {
+    height: 100%;
+}
+
+.carousel-item img {
+    height: 100%;
+    object-fit: cover;
+    border-radius: 30px;
+}
+
+.carousel-indicators {
+    margin-bottom: 1rem;
+}
+
+/* Laptops (1024px to 1340px) */
+@media screen and (min-width: 1024px) and (max-width: 1399px) {
+    .mensaje {
+        width: 500px;
+    }
+    
+    #carouselGanadero {
+        width: 400px;
+        height: 350px;
+        margin: 550px;
+    }
+}
+
+/* Desktop Computers (1441px and above) */
+@media screen and (min-width: 1400px) {
+    .mensaje {
+        margin-top: 130px;
+        width: 500px;
+    }
+
+    #carouselGanadero {
+        width: 450px;
+        height: 400px;
+        margin: 600px;
+    }
+    
+}
