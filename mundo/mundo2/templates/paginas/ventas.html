@@ -1,0 +1,279 @@
+{% extends "Base2.html" %}
+{% load static %}
+{% load humanize %}
+{% block titulo %} Mundo Bovino {% endblock %}
+{% block css %}
+<link href="{% static 'css/ventas.css' %}" rel="stylesheet">
+{% endblock %}
+{% block contenido %} {% endblock %}
+
+{% block main %}
+    <!-- Mensajes de alerta -->
+    <div class="mensajes-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close-btn" onclick="this.parentElement.style.display='none'">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-8 offset-md-2">
+                <form class="navbar-form" role="search" method="GET" action="{% url 'ventas' %}">
+                    <div class="form-group">
+                        <!-- Campo de búsqueda con atributo autofocus y oninput para enviar el formulario automáticamente -->
+                        <input type="text" class="form-control" name="busqueda" placeholder="Buscar..." 
+                               value="{{ busqueda }}" autofocus 
+                               onchange="this.form.submit()">
+                        <img src="{% static 'img/lupa.png' %}" class="lupa" alt="lupa">
+                        
+                        <div class="filtrado-container">
+                            <button class="dropdown-toggle" id="toggle" type="button"
+                                    data-bs-toggle="dropdown" role="button"><b>
+                                        <img src="{% static 'img/filtrar.png' %}" alt="filtrar">
+                                        {{ valor_filtro|default:"Filtrar por" }}
+                                    </b>
+                            </button>
+                            <div class="dropdown-menu" id="dropdown-filtrar">
+                                <a class="dropdown-item" href="?{% if busqueda %}busqueda={{ busqueda }}&{% endif %}tipo_filtro=fecha&valor=fecha">
+                                    <b>Fecha de venta</b>
+                                </a>
+                                <a class="dropdown-item" href="?{% if busqueda %}busqueda={{ busqueda }}&{% endif %}tipo_filtro=cliente&valor=cliente">
+                                    <b>Cliente</b>
+                                </a>
+                                <a class="dropdown-item" href="{% url 'ventas' %}">
+                                    <b>Limpiar filtros</b>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="boton-seccion">
+                            <button type="button" class="btn-guardar" data-bs-toggle="modal" data-bs-target="#compraModal">
+                                <img src="{% static 'img/agregar.png' %}" class="agregar" alt="agregar">
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Si hay filtros activos, mostrar indicadores -->
+        {% if busqueda or valor_filtro %}
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <div class="filtros-activos">
+                        {% if busqueda %}
+                            <!-- Badge para el término de búsqueda -->
+                            <span class="badge bg-secondary me-2">Búsqueda: {{ busqueda }}
+                                <a href="?{% if tipo_filtro %}tipo_filtro={{ tipo_filtro }}&valor={{ valor_filtro }}{% endif %}" class="text-white ms-1">×</a>
+                            </span>
+                            {% if tipo_busqueda %}
+                                {% if tipo_busqueda == "fecha" %}
+                                    <span class="badge bg-info me-2">Tipo: Fecha de venta</span>
+                                {% else %}
+                                    <span class="badge bg-warning me-2">Tipo: Nombre cliente</span>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                        
+                        {% if valor_filtro %}
+                            <span class="badge bg-secondary me-2">Tipo: {{ valor_filtro }}
+                                <a href="?{% if busqueda %}busqueda={{ busqueda }}{% endif %}" class="text-white ms-1">×</a>
+                            </span>
+                        {% endif %}
+                        
+                        {% if busqueda or valor_filtro %}
+                            <a href="{% url 'ventas' %}" class="btn btn-sm btn-outline-secondary">Limpiar todos</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Listado de ventas -->
+        <div class="row mt-3 fichas-container">
+            {% if ventas %}
+                {% for venta in ventas %}
+                <div class="col-md-3 mb-3">
+                    <div class="fichas">
+                        <!-- Imagen de la venta -->
+                        <div class="compra-img">
+                            <img src="{% static 'img/compra.png' %}" alt="venta">
+                        </div>
+                        <!-- Información de la venta -->
+                        <div class="info-principal">
+                            <h3>Venta #{{ venta.cod_ven }}</h3>
+                            <p class="tipo">Cliente: {{ venta.nom_cli }}</p>
+                            <p class="fecha">Fecha: {{ venta.fecha|date:"d/m/Y" }}</p>
+                            <p class="precio">Total: ${{ venta.precio_total|floatformat:0|intcomma }}</p>
+                            
+                            <a href="#" data-bs-toggle="modal" class="btn-ver" data-bs-target="#detalleVentaModal-{{ venta.cod_ven }}">Ver detalle</a>
+                        </div>
+
+                        <!-- Botón para eliminar venta -->
+                        <form action="{% url 'eliminar_venta' venta.cod_ven %}" method="POST" id="delete-form-{{ venta.cod_ven }}">
+                            {% csrf_token %}
+                            <button type="button" class="btn-eliminar" onclick="document.getElementById('confirmDeleteModal-{{ venta.cod_ven }}').style.display='flex'">
+                                <img src="{% static 'img/eliminar.png' %}" alt="eliminar" width="20">
+                            </button>
+                        </form>
+
+                        <!-- Modal de confirmación personalizado--> 
+                        <div id="confirmDeleteModal-{{ venta.cod_ven }}" class="custom-modal">
+                            <div class="custom-modal-content">
+                                <div class="custom-modal-header">
+                                    <h3>Confirmar eliminación</h3>
+                                </div>
+                                <div class="custom-modal-body">
+                                    <p>¿Estás seguro de eliminar esta venta al cliente {{ venta.nom_cli }}?</p>
+                                </div>
+                                <div class="custom-modal-footer">
+                                    <form action="{% url 'eliminar_venta' venta.cod_ven %}" method="POST" id="delete-form-{{ venta.cod_ven }}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="button" class="btn-cancelar" onclick="document.getElementById('confirmDeleteModal-{{ venta.cod_ven }}').style.display='none'">Cancelar</button>
+                                        <button type="button" class="btn-confirmar" onclick="document.getElementById('delete-form-{{ venta.cod_ven }}').submit()">Eliminar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Modal para mostrar el detalle de esta venta específica -->
+                        <div class="modal fade" id="detalleVentaModal-{{ venta.cod_ven }}" tabindex="-1" aria-labelledby="detalleVentaModalLabel-{{ venta.cod_ven }}" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="detalleVentaModalLabel-{{ venta.cod_ven }}">Detalle de Venta #{{ venta.cod_ven }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!-- Información general de la venta -->
+                                        <div class="row mb-4">
+                                            <div class="col-md-6">
+                                                <h5>Información General</h5>
+                                                <table class="table table-borderless">
+                                                    <tr>
+                                                        <th>Fecha:</th>
+                                                        <td>{{ venta.fecha|date:"d/m/Y" }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Cliente:</th>
+                                                        <td>{{ venta.nom_cli }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Cantidad de Animales:</th>
+                                                        <td>{{ venta.cantidad }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Precio Total:</th>
+                                                        <td>${{ venta.precio_total|floatformat:0|intcomma }}</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Detalles de los animales -->
+                                        <h5>Detalles de Animales</h5>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead class="thead-dark">
+                                                    <tr>
+                                                        <th>Código Animal</th>
+                                                        <th>Edad</th>
+                                                        <th>Peso</th>
+                                                        <th>Precio Unitario</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for detalle in venta.detalles.all %}
+                                                        <tr>
+                                                            <td>{{ detalle.cod_ani }}</td>
+                                                            <td>{{ detalle.edad_aniven }} meses</td>
+                                                            <td>{{ detalle.peso_aniven }} kg</td>
+                                                            <td>${{ detalle.precio_uni|floatformat:0|intcomma }}</td>
+                                                        </tr>
+                                                    {% empty %}
+                                                        <tr>
+                                                            <td colspan="4" class="text-center">No hay animales registrados en esta venta.</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a href="{% url 'descargar_venta' venta.cod_ven %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-print"></i> Descargar
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center">
+                    <p>No hay ventas registradas.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal para registrar venta -->
+    <div class="modal fade" id="compraModal" tabindex="-1" aria-labelledby="ventaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ventaModalLabel">Registrar nueva venta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{% url 'crear_venta' %}" enctype="multipart/form-data" id="formulario-venta">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="fecha">Fecha de Venta:</label>
+                                <input type="date" id="fecha" name="fecha" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="nom_cli">Cliente:</label>
+                                <input type="text" id="nom_cli" name="nom_cli" class="form-control" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="cantidad">Cantidad de Animales:</label>
+                                <input type="number" id="cantidad" name="cantidad" class="form-control" min="1" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="precio_total">Precio Total:</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" id="precio_total" name="precio_total" class="form-control" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Contenedor para los detalles de animales (se generará dinámicamente) -->
+                        <div id="detalles_animales" class="mb-4">
+                            <!-- Aquí se generarán los campos para cada animal -->
+                        </div>
+                    </form>
+                </div>    
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn" form="formulario-venta">Guardar Venta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/ventas.js' %}"></script>
+{% endblock %}

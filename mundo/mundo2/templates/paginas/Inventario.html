@@ -110,113 +110,113 @@
         {% endif %}
 
         <!-- Listado de animales -->
-    <div class="row mt-3 fichas-container">
-        {% for animal in animales %}
-            <div class="col-md-3 mb-3">
-                <div class="fichas">
-                    <!-- Imagen del toro -->
-                    <div class="toro-img">
-                        <img src="{% static 'img/toro.png' %}" alt="toro">
-                    </div>
-                    
-                    <!-- ID y Fecha debajo de la imagen -->
-                    <div class="info-principal">
-                        <p><b>ID Animal:</b> {{ animal.cod_ani }}</p>
-                        <p><b>Fecha de Ingreso:</b> {{ animal.fecha|date:"d/m/Y" }}</p>
-                    </div>
-                    
-                    <!-- Información adicional en dos columnas -->
-                    <div class="info-detalle">
-                        <!-- Columna izquierda -->
-                        <div class="detalle-izquierda">
-                            <p><b>Edad:</b> {{ animal.edad }} años</p>
-                            <p><b>Peso:</b> {{ animal.peso }} kg</p>
+        <div class="row mt-3 fichas-container">
+            {% for animal in animales %}
+                <div class="col-md-3 mb-4">
+                    <div class="fichas">
+                        <!-- Imagen del toro -->
+                        <div class="toro-img">
+                            <img src="{% static 'img/toro.png' %}" alt="toro">
                         </div>
-                        <!-- Columna derecha -->
-                        <div class="detalle-derecha">
-                            <p><b>Raza:</b> {{ animal.raza }}</p>
-                            <p><b>Estado:</b> {{ animal.estado }}</p>
+                        
+                        <!-- ID y Fecha debajo de la imagen -->
+                        <div class="info-principal">
+                            <p><b>ID Animal:</b> {{ animal.cod_ani }}</p>
+                            <p><b>Fecha de Ingreso:</b> {{ animal.fecha|date:"d/m/Y" }}</p>
                         </div>
-                    </div>
+                        
+                        <!-- Información adicional en dos columnas -->
+                        <div class="info-detalle">
+                            <!-- Columna izquierda -->
+                            <div class="detalle-izquierda">
+                                <p><b>Edad:</b> {{ animal.edad }} años</p>
+                                <p><b>Peso:</b> {{ animal.peso }} kg</p>
+                            </div>
+                            <!-- Columna derecha -->
+                            <div class="detalle-derecha">
+                                <p><b>Raza:</b> {{ animal.raza }}</p>
+                                <p><b>Estado:</b> {{ animal.estado }}</p>
+                            </div>
+                        </div>
 
-                    <!-- Botón para eliminar animal -->
-                    <form action="{% url 'eliminar_animal' animal.cod_ani %}" method="POST" id="delete-form-{{ animal.cod_ani }}">
-                        {% csrf_token %}
+                        <!-- Botones para eliminar y editar animal (POSICIONES CORREGIDAS) -->
+                        <button type="button" class="btn-editar" data-bs-toggle="modal" data-bs-target="#editModal-{{ animal.cod_ani }}">
+                            <img src="{% static 'img/editar.png' %}" alt="editar" width="20">
+                        </button>
+                        
                         <button type="button" class="btn-eliminar" onclick="document.getElementById('confirmDeleteModal-{{ animal.cod_ani }}').style.display='flex'">
                             <img src="{% static 'img/eliminar.png' %}" alt="eliminar" width="20">
                         </button>
-                    </form>
 
-                    <!-- Modal de confirmación personalizado -->
-                    <div id="confirmDeleteModal-{{ animal.cod_ani }}" class="custom-modal">
-                        <div class="custom-modal-content">
-                            <div class="custom-modal-header">
-                                <h3>Confirmar eliminación</h3>
-                            </div>
-                            <div class="custom-modal-body">
-                                <p>¿Estás seguro de eliminar este animal (ID: {{ animal.cod_ani }})?</p>
-                            </div>
-                            <div class="custom-modal-footer">
-                                <button type="button" class="btn-cancelar" onclick="document.getElementById('confirmDeleteModal-{{ animal.cod_ani }}').style.display='none'">Cancelar</button>
-                                <button type="button" class="btn-confirmar" onclick="document.getElementById('delete-form-{{ animal.cod_ani }}').submit()">Eliminar</button>
+                        <!-- Modal de confirmación personalizado -->
+                        <div id="confirmDeleteModal-{{ animal.cod_ani }}" class="custom-modal">
+                            <div class="custom-modal-content">
+                                <div class="custom-modal-header">
+                                    <h3>Confirmar eliminación</h3>
+                                </div>
+                                <div class="custom-modal-body">
+                                    <p>¿Estás seguro de eliminar este animal (ID: {{ animal.cod_ani }})?</p>
+                                </div>
+                                <div class="custom-modal-footer">
+                                    <button type="button" class="btn-cancelar" onclick="document.getElementById('confirmDeleteModal-{{ animal.cod_ani }}').style.display='none'">Cancelar</button>
+                                    <form action="{% url 'eliminar_animal' animal.cod_ani %}" method="POST" id="delete-form-{{ animal.cod_ani }}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-confirmar">Eliminar</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Botón para editar animal -->
-                    <button type="button" class="btn-editar" data-bs-toggle="modal" data-bs-target="#editModal-{{ animal.cod_ani }}">
-                        <img src="{% static 'img/editar.png' %}" alt="editar" width="20">
-                    </button>
-
-                    <!-- Modal para editar animal -->
-                    <div class="modal fade" id="editModal-{{ animal.cod_ani }}" tabindex="-1" aria-labelledby="editModalLabel-{{ animal.cod_ani }}" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="editModalLabel-{{ animal.cod_ani }}">Editar Animal</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                    
-                                <div class="modal-body">
-                                    <form method="POST" action="{% url 'editar_animal' animal.cod_ani %}" id="edit-form-{{ animal.cod_ani }}">
-                                        {% csrf_token %}
-                                        <div class="mb-3">
-                                            <label for="codigo_animal_edit" class="form-label">Código Animal:</label>
-                                            <input type="text" class="form-control" id="codigo_animal_edit" readonly value="{{ animal.cod_ani }}">
-                                            <small class="form-text text-muted">Este es el código único de tu animal.</small>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="fecha_edit" class="form-label">Fecha de Ingreso:</label>
-                                            <input type="date" class="form-control" id="fecha_edit" name="fecha" value="{{ animal.fecha|date:'Y-m-d' }}" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="edad_edit" class="form-label">Edad:</label>
-                                            <input type="number" class="form-control" id="edad_edit" name="edad" value="{{ animal.edad }}" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="peso_edit" class="form-label">Peso:</label>
-                                            <input type="number" step="0.01" class="form-control" id="peso_edit" name="peso" value="{{ animal.peso }}" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="raza_edit" class="form-label">Raza:</label>
-                                            <input type="text" class="form-control" id="raza_edit" name="raza" value="{{ animal.raza }}" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="estado_edit" class="form-label">Estado:</label>
-                                            <select class="form-select" id="estado_edit" name="estado" required>
-                                                <option value="" disabled>Selecciona una opción</option>
-                                                <option value="Saludable" {% if animal.estado == 'Saludable' %}selected{% endif %}>Saludable</option>
-                                                <option value="En reposo" {% if animal.estado == 'En reposo' %}selected{% endif %}>En reposo</option>
-                                                <option value="En crecimiento" {% if animal.estado == 'En crecimiento' %}selected{% endif %}>En crecimiento</option>
-                                                <option value="Enfermo" {% if animal.estado == 'Enfermo' %}selected{% endif %}>Enfermo</option>
-                                                <option value="Fallecido" {% if animal.estado == 'Fallecido' %}selected{% endif %}>Fallecido</option>
-                                            </select>
-                                        </div>    
-                                    </form>            
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn" data-bs-dismiss="modal">Cancelar</button>
-                                    <button type="submit" class="btn" form="edit-form-{{ animal.cod_ani }}">Guardar cambios</button>
+                        <!-- Modal para editar animal -->
+                        <div class="modal fade" id="editModal-{{ animal.cod_ani }}" tabindex="-1" aria-labelledby="editModalLabel-{{ animal.cod_ani }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editModalLabel-{{ animal.cod_ani }}">Editar Animal</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                        
+                                    <div class="modal-body">
+                                        <form method="POST" action="{% url 'editar_animal' animal.cod_ani %}" id="edit-form-{{ animal.cod_ani }}">
+                                            {% csrf_token %}
+                                            <div class="mb-3">
+                                                <label for="codigo_animal_edit" class="form-label">Código Animal:</label>
+                                                <input type="text" class="form-control" id="codigo_animal_edit" readonly value="{{ animal.cod_ani }}">
+                                                <small class="form-text text-muted">Este es el código único de tu animal.</small>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="fecha_edit" class="form-label">Fecha de Ingreso:</label>
+                                                <input type="date" class="form-control" id="fecha_edit" name="fecha" value="{{ animal.fecha|date:'Y-m-d' }}" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="edad_edit" class="form-label">Edad:</label>
+                                                <input type="number" class="form-control" id="edad_edit" name="edad" value="{{ animal.edad }}" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="peso_edit" class="form-label">Peso:</label>
+                                                <input type="number" step="0.01" class="form-control" id="peso_edit" name="peso" value="{{ animal.peso }}" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="raza_edit" class="form-label">Raza:</label>
+                                                <input type="text" class="form-control" id="raza_edit" name="raza" value="{{ animal.raza }}" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="estado_edit" class="form-label">Estado:</label>
+                                                <select class="form-select" id="estado_edit" name="estado" required>
+                                                    <option value="" disabled>Selecciona una opción</option>
+                                                    <option value="Saludable" {% if animal.estado == 'Saludable' %}selected{% endif %}>Saludable</option>
+                                                    <option value="En reposo" {% if animal.estado == 'En reposo' %}selected{% endif %}>En reposo</option>
+                                                    <option value="En crecimiento" {% if animal.estado == 'En crecimiento' %}selected{% endif %}>En crecimiento</option>
+                                                    <option value="Enfermo" {% if animal.estado == 'Enfermo' %}selected{% endif %}>Enfermo</option>
+                                                    <option value="Fallecido" {% if animal.estado == 'Fallecido' %}selected{% endif %}>Fallecido</option>
+                                                </select>
+                                            </div>    
+                                        </form>            
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn" form="edit-form-{{ animal.cod_ani }}">Guardar cambios</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -228,8 +228,9 @@
                 </div>
             {% endfor %}
         </div>
+    </div>
 
-    <!-- Modal de Bootstrap -->
+    <!-- Modal de Bootstrap para agregar nuevo animal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

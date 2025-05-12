@@ -1,16 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.sessions.backends.db import SessionStore
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
-from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 from .forms import AdministradorRegistroForm
-from .models import Administrador, Agenda, Animal, Documento
+from .models import Administrador, Agenda, Animal, Documento, Compra, DetCom, Venta, DetVen, Contacto
 from django.db import connection
 from functools import wraps
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timedelta
 import calendar
+from xhtml2pdf import pisa
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+
 
 # Create your views here.
 def bienvenido(request):
@@ -818,12 +821,13 @@ def obtener_recordatorios(usuario_id):
     }
     
     try:
-        # Buscar eventos para cada fecha de recordatorio que no estén completados
+        # Buscar eventos para cada fecha de recordatorio que tengan estado 'Pendiente'
         for periodo, fecha in fechas_recordatorio.items():
             eventos = Agenda.objects.filter(
                 id_adm=usuario_id,
-                fecha=fecha
-            ).exclude(estado='Realizada')
+                fecha=fecha,
+                estado='Pendiente'  # Solo eventos con estado pendiente
+            )
             
             # Formatear los datos para mostrarlos en las notificaciones
             eventos_formateados = []
@@ -1173,14 +1177,758 @@ def eliminar_documento(request, documento_id):
     return redirect('documento')
 
 @login_required
-def agenda(request):
-    # Filtrar contactos por administrador actual si es necesario
+def compras(request):
+    # Obtener el ID del administrador actual desde la sesión
     usuario_id = request.session.get('usuario_id')
     
-    return render(request, 'paginas/agenda.html', {
-        'current_page_name': 'Agenda'
+    try:
+        # Obtener todas las compras del administrador actual
+        compras = Compra.objects.filter(id_adm=usuario_id).order_by('-fecha')
+        
+        # Obtener parámetros de búsqueda y filtrado
+        busqueda = request.GET.get('busqueda', '')
+        tipo_filtro = request.GET.get('tipo_filtro', '')
+        fecha_inicio = request.GET.get('fecha_inicio', '')
+        fecha_fin = request.GET.get('fecha_fin', '')
+        
+        # Aplicar filtros según los parámetros recibidos
+        if busqueda:
+            # Buscar por proveedor
+            compras = compras.filter(nom_prov__icontains=busqueda)
+        
+        # Filtrar por rango de fechas si se proporcionan
+        if fecha_inicio and fecha_fin:
+            compras = compras.filter(fecha__gte=fecha_inicio, fecha__lte=fecha_fin)
+        
+        # Obtener todos los animales disponibles para el selector de animales
+        animales = Animal.objects.filter(id_adm=usuario_id)
+        
+        # Determinar el siguiente código de compra para este administrador
+        siguiente_cod_com = 1
+        ultima_compra = Compra.objects.filter(id_adm=usuario_id).order_by('-cod_com').first()
+        if ultima_compra:
+            siguiente_cod_com = ultima_compra.cod_com + 1
+        
+        # Define compras_query aquí
+        compras_query = compras  # Esta línea es la que falta en tu código original
+        
+        # Obtener detalles para cada compra
+        compras_list = []
+        for compra in compras_query:  # Ahora compras_query está definido
+            # Prefetch relacionados para evitar consultas N+1
+            detalles = DetCom.objects.filter(cod_com=compra.cod_com).select_related()
+            compra.detalles = detalles  # Añadir detalles a la compra
+            compras_list.append(compra)
+        
+        return render(request, 'paginas/compras.html', {
+            'compras': compras_list,  # Deberías usar compras_list aquí, no compras
+            'animales': animales,
+            'proximo_codigo': siguiente_cod_com,
+            'busqueda': busqueda,
+            'tipo_filtro': tipo_filtro,
+            'fecha_inicio': fecha_inicio,
+            'fecha_fin': fecha_fin,
+            'current_page_name': 'Registro de Compras',
+            'recordatorios': request.recordatorios,
+            'hay_recordatorios': request.hay_recordatorios,
+            'total_recordatorios': request.total_recordatorios
+        })
+    
+    except Exception as e:
+        messages.error(request, f"Error al cargar las compras: {str(e)}")
+        return redirect('home')
+        
+@login_required
+def crear_compra(request):
+    """
+    Vista para crear una nueva compra con sus detalles
+    """
+    if request.method == 'POST':
+        try:
+            # Obtener el ID del administrador actual desde la sesión
+            usuario_id = request.session.get('usuario_id')
+            
+            # Obtener datos del formulario
+            fecha = request.POST.get('fecha')
+            nom_prov = request.POST.get('nom_prov')
+            cantidad = int(request.POST.get('cantidad'))
+            
+            # Formatear correctamente el precio total
+            precio_total_str = request.POST.get('precio_total', '0')
+            # Primero eliminamos todos los puntos (separadores de miles)
+            precio_total_str = precio_total_str.replace('.', '')
+            # Luego reemplazamos la coma decimal por punto (si existe)
+            precio_total_str = precio_total_str.replace(',', '.')
+            # Convertimos a float
+            precio_total = float(precio_total_str)
+            
+            # Determinar el siguiente código de compra para este administrador
+            siguiente_cod_com = 1
+            ultima_compra = Compra.objects.filter(id_adm=usuario_id).order_by('-cod_com').first()
+            if ultima_compra:
+                siguiente_cod_com = ultima_compra.cod_com + 1
+            
+            # Crear la compra
+            compra = Compra.objects.create(
+                cod_com=siguiente_cod_com,
+                id_adm_id=usuario_id,
+                fecha=fecha,
+                nom_prov=nom_prov,
+                cantidad=cantidad,
+                precio_total=precio_total
+            )
+            
+            # Procesar detalles de animales
+            for i in range(1, cantidad + 1):
+                cod_ani = request.POST.get(f'cod_ani_{i}')  # Cambiado de cod_ani_id a cod_ani
+                edad_anicom = request.POST.get(f'edad_aniCom_{i}')
+                peso_ani = request.POST.get(f'peso_ani_{i}')
+                
+                # Formatear correctamente el precio unitario
+                precio_uni_str = request.POST.get(f'precio_uni_{i}', '0')
+                precio_uni_str = precio_uni_str.replace('.', '')  # Eliminar puntos de miles
+                precio_uni_str = precio_uni_str.replace(',', '.')  # Reemplazar coma decimal por punto
+                precio_uni = float(precio_uni_str)
+                
+                # Crear el detalle de compra
+                DetCom.objects.create(
+                    cod_com=compra,
+                    cod_ani=cod_ani,  # Cambiado de cod_ani_id a cod_ani
+                    edad_anicom=edad_anicom or 0,  # Asignar 0 si no se proporciona
+                    peso_anicom=peso_ani or 0,  # Asignar 0 si no se proporciona
+                    precio_uni=precio_uni
+                )
+            
+            messages.success(request, "Compra registrada exitosamente")
+            return redirect('compras')
+        except Exception as e:
+            messages.error(request, f"Error al registrar la compra: {str(e)}")
+            return redirect('compras')
+    else:
+        return redirect('compras')
+
+# Vista API para obtener el siguiente código de animal
+@login_required
+def api_siguiente_codigo_animal(request):
+    """API para obtener el siguiente código de animal disponible"""
+    try:
+        # Buscar el último animal en la base de datos
+        ultimo_animal = Animal.objects.all().order_by('-cod_ani').first()
+        siguiente_codigo = 1 if not ultimo_animal else ultimo_animal.cod_ani + 1
+        
+        # Registrar información de depuración
+        print(f"Último código encontrado: {ultimo_animal.cod_ani if ultimo_animal else 'Ninguno'}")
+        print(f"Siguiente código asignado: {siguiente_codigo}")
+        
+        return JsonResponse({'siguiente_codigo': siguiente_codigo})
+    except Exception as e:
+        # Registrar el error para depuración
+        import traceback
+        print(f"Error en API siguiente_codigo_animal: {str(e)}")
+        print(traceback.format_exc())
+        
+@login_required
+def eliminar_compra(request, compra_id):
+    # Obtener el ID del administrador actual desde la sesión
+    usuario_id = request.session.get('usuario_id')
+    
+    try:
+        # Buscar la compra asegurándose que pertenezca al administrador actual
+        compra = Compra.objects.get(cod_com=compra_id, id_adm=usuario_id)
+        
+        # Primero, eliminar todos los detalles de compra asociados
+        DetCom.objects.filter(cod_com=compra).delete()
+        
+        # Luego, eliminar la compra principal
+        compra.delete()
+        
+        messages.success(request, f"¡Compra #{compra_id} eliminada con éxito!")
+    
+    except Compra.DoesNotExist:
+        messages.error(request, "Error: La compra no existe o no tienes permiso para eliminarla.")
+    except Exception as e:
+        messages.error(request, f"Error al eliminar la compra: {str(e)}")
+    
+    return redirect('compras')
+
+@login_required
+def compra_pdf(request, compra_id):
+    # Obtener la compra desde la base de datos
+    compra = get_object_or_404(Compra, cod_com=compra_id)
+    
+    # Definir el HTML directamente en el código - solución más sencilla y directa
+    html = f"""
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Detalle de Compra #{compra.cod_com}</title>
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                line-height: 1.6;
+            }}
+            .header {{
+                margin-bottom: 20px;
+            }}
+            .title {{
+                margin-bottom: 15px;
+            }}
+            h1 {{
+                font-size: 24px;
+                color: #333;
+            }}
+            h2 {{
+                font-size: 18px;
+                color: #555;
+                margin-top: 20px;
+            }}
+            .section {{
+                margin-bottom: 30px;
+            }}
+            .info-table {{
+                width: 100%;
+                margin-bottom: 20px;
+            }}
+            .label {{
+                font-weight: bold;
+                width: 30%;
+            }}
+            .data-table {{
+                width: 100%;
+                border-collapse: collapse;
+            }}
+            .data-table th, .data-table td {{
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }}
+            .data-table th {{
+                background-color: #f2f2f2;
+            }}
+            .footer {{
+                margin-top: 30px;
+                text-align: center;
+                font-size: 12px;
+                color: #777;
+            }}
+            hr {{
+                border: 0;
+                border-top: 1px solid #eee;
+                margin: 20px 0;
+            }}
+            /* Estilos para número de página */
+            .footer {{
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+                text-align: center;
+                font-size: 12px;
+                color: #777;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1 class="title">Detalle de Compra #{compra.cod_com}</h1>
+            <hr>
+        </div>
+
+        <div class="section">
+            <h2>Información General</h2>
+            
+            <table class="info-table">
+                <tr>
+                    <td class="label">Fecha:</td>
+                    <td>{compra.fecha.strftime('%d/%m/%Y')}</td>
+                </tr>
+                <tr>
+                    <td class="label">Proveedor:</td>
+                    <td>{compra.nom_prov}</td>
+                </tr>
+                <tr>
+                    <td class="label">Cantidad de Animales:</td>
+                    <td>{compra.cantidad}</td>
+                </tr>
+                <tr>
+                    <td class="label">Precio Total:</td>
+                    <td>${compra.precio_total:,.0f}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Detalles de Animales</h2>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Código Animal</th>
+                        <th>Edad</th>
+                        <th>Peso</th>
+                        <th>Precio Unitario</th>
+                    </tr>
+                </thead>
+                <tbody>
+    """
+    
+    # Añadir filas para cada animal según tu estructura de datos
+    # Basado en la estructura que veo en compras.html
+    if hasattr(compra, 'detcom_set') and compra.detcom_set.exists():
+        for detalle in compra.detcom_set.all():
+            html += f"""
+                <tr>
+                    <td>{detalle.cod_ani}</td>
+                    <td>{detalle.edad_anicom} meses</td>
+                    <td>{detalle.peso_anicom} kg</td>
+                    <td>${detalle.precio_uni:,.0f}</td>
+                </tr>
+            """
+    else:
+        html += """
+                <tr>
+                    <td colspan="4" style="text-align: center;">No hay animales registrados en esta compra.</td>
+                </tr>
+        """
+    
+    # Cerrar el HTML
+    html += """
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            Página <pdf:pagenumber> de <pdf:pagecount>
+        </div>
+    </body>
+    </html>
+    """
+    
+    # Configurar la respuesta HTTP para el PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="compra_{compra_id}.pdf"'
+    
+    # Crear el PDF
+    pisa_status = pisa.CreatePDF(
+        html,
+        dest=response
+    )
+    
+    # Manejar errores
+    if pisa_status.err:
+        return HttpResponse('Error al generar el PDF', status=500)
+    return response
+
+@login_required
+def cancelar_compra(request):
+    """
+    Vista para manejar la cancelación del formulario de compra
+    """
+    if request.method == 'POST':
+        # No necesitamos hacer nada con los datos del formulario
+        # Simplemente redirigimos a la página de compras
+        # Django no conservará los datos del formulario en este caso
+        messages.info(request, "Registro de compra cancelado")
+        return redirect('compras')
+    else:
+        # Si no es un POST request, redirigir a la página de compras
+        return redirect('compras')
+
+@login_required
+def ventas(request):
+    """Vista principal para mostrar todas las ventas del administrador actual."""
+    usuario_id = request.session.get('usuario_id')
+    
+    try:
+        # Obtener todas las ventas del administrador actual
+        ventas = Venta.objects.filter(id_adm=usuario_id).order_by('-fecha')
+        
+        # Obtener parámetros de búsqueda y filtrado
+        busqueda = request.GET.get('busqueda', '')
+        tipo_filtro = request.GET.get('tipo_filtro', '')
+        valor_filtro = request.GET.get('valor', '')
+        fecha_inicio = request.GET.get('fecha_inicio', '')
+        fecha_fin = request.GET.get('fecha_fin', '')
+        
+        # Aplicar filtros según los parámetros recibidos
+        if busqueda:
+            # Buscar por cliente
+            ventas = ventas.filter(nom_cli__icontains=busqueda)
+        
+        # Filtrar por rango de fechas si se proporcionan
+        if fecha_inicio and fecha_fin:
+            ventas = ventas.filter(fecha__gte=fecha_inicio, fecha__lte=fecha_fin)
+        
+        # Obtener detalles para cada venta
+        for venta in ventas:
+            venta.detalles = DetVen.objects.filter(cod_ven=venta.cod_ven)
+        
+        context = {
+            'ventas': ventas,
+            'proximo_codigo': 1,  # Valor por defecto, ajusta según tu lógica
+            'busqueda': busqueda,
+            'tipo_filtro': tipo_filtro,
+            'valor_filtro': valor_filtro,
+            'fecha_inicio': fecha_inicio,
+            'fecha_fin': fecha_fin,
+            'current_page_name': 'Registro de Ventas',
+        }
+        
+        return render(request, 'paginas/ventas.html', context)
+    
+    except Exception as e:
+        messages.error(request, f"Error al cargar las ventas: {str(e)}")
+        return redirect('home')
+
+@login_required
+def crear_venta(request):
+    """Vista para crear una nueva venta con sus detalles."""
+    if request.method == 'POST':
+        try:
+            # Obtener el ID del administrador actual desde la sesión
+            usuario_id = request.session.get('usuario_id')
+            
+            # Obtener datos del formulario
+            fecha = request.POST.get('fecha')
+            nom_cli = request.POST.get('nom_cli')
+            cantidad = int(request.POST.get('cantidad'))
+
+            # Formatear correctamente el precio total
+            precio_total_str = request.POST.get('precio_total', '0')
+            # Primero eliminamos todos los puntos (separadores de miles)
+            precio_total_str = precio_total_str.replace('.', '')
+            # Luego reemplazamos la coma decimal por punto (si existe)
+            precio_total_str = precio_total_str.replace(',', '.')
+            # Convertimos a float
+            precio_total = float(precio_total_str)
+            
+            # Determinar el siguiente código de venta para este administrador
+            siguiente_cod_ven = 1
+            ultima_venta = Venta.objects.filter(id_adm=usuario_id).order_by('-cod_ven').first()
+            if ultima_venta:
+                siguiente_cod_ven = ultima_venta.cod_ven + 1
+            
+            # Crear la venta
+            venta = Venta.objects.create(
+                cod_ven=siguiente_cod_ven,
+                id_adm_id=usuario_id,
+                fecha=fecha,
+                nom_cli=nom_cli,
+                cantidad=cantidad,
+                precio_total=precio_total
+            )
+            
+            # Procesar detalles de animales
+            for i in range(1, cantidad + 1):
+                # Obtener valores con validación
+                cod_ani = request.POST.get(f'cod_ani_{i}', '')
+                edad_aniven = request.POST.get(f'edad_aniven_{i}', '0')
+                peso_aniven = request.POST.get(f'peso_aniven_{i}', '0')
+                
+                # Asegurar que los campos no sean None o cadenas vacías
+                if not cod_ani:
+                    messages.error(request, f"Código de animal es requerido para el animal {i}")
+                    continue
+                
+                # Formatear correctamente el precio unitario
+                precio_uni_str = request.POST.get(f'precio_uni_{i}', '0')
+                precio_uni_str = precio_uni_str.replace('.', '')  # Eliminar puntos de miles
+                precio_uni_str = precio_uni_str.replace(',', '.')  # Reemplazar coma decimal por punto
+                precio_uni = float(precio_uni_str)
+                
+                # Crear el detalle de venta con valores por defecto si están vacíos
+                DetVen.objects.create(
+                    cod_ven=venta,
+                    cod_ani=cod_ani,
+                    edad_aniven=edad_aniven or 0,  # Valor por defecto 0 si está vacío
+                    peso_aniven=peso_aniven or 0,  # Valor por defecto 0 si está vacío
+                    precio_uni=precio_uni,
+                )
+            
+            messages.success(request, "Venta registrada exitosamente")
+            return redirect('ventas')
+        except Exception as e:
+            messages.error(request, f"Error al registrar la venta: {str(e)}")
+            return redirect('ventas')
+    else:
+        return redirect('ventas')
+    
+@login_required
+def eliminar_venta(request, venta_id):
+    """Vista para eliminar una venta y sus detalles asociados."""
+    usuario_id = request.session.get('usuario_id')
+    
+    try:
+        # Buscar la venta asegurándose que pertenezca al administrador actual
+        venta = Venta.objects.get(cod_ven=venta_id, id_adm=usuario_id)
+        
+        # Primero, eliminar todos los detalles de venta asociados
+        DetVen.objects.filter(cod_ven=venta).delete()
+        
+        # Luego, eliminar la venta principal
+        venta.delete()
+        
+        messages.success(request, f"¡Venta #{venta_id} eliminada con éxito!")
+    
+    except Venta.DoesNotExist:  # Corregido de Compra.DoesNotExist
+        messages.error(request, "Error: La venta no existe o no tienes permiso para eliminarla.")
+    except Exception as e:
+        messages.error(request, f"Error al eliminar la venta: {str(e)}")
+    
+    return redirect('ventas')
+
+@login_required
+def descargar_detalle_venta(request, venta_id):
+    """Vista para descargar el detalle de una venta específica"""
+    try:
+        venta = Venta.objects.get(cod_ven=venta_id)
+        return render(request, 'paginas/ventas_pdf.html', {'venta': venta})
+    except Venta.DoesNotExist:
+        messages.error(request, "La venta no existe.")
+        return redirect('ventas')
+
+@login_required
+def detalle_venta(request, cod_ven):
+    """Vista para obtener los detalles de una venta"""
+    try:
+        venta = Venta.objects.get(cod_ven=cod_ven)
+        
+        # Obtener los detalles directamente desde DetVen
+        detalles_animales = DetVen.objects.filter(cod_ven=venta).values(
+            'cod_ani', 
+            'edad_aniven', 
+            'peso_aniven', 
+            'precio_uni'
+        )
+        
+        contexto = {
+            'venta': venta,
+            'detalles_animales': list(detalles_animales)
+        }
+        
+        return render(request, 'venta.html', contexto)
+    except Venta.DoesNotExist:
+        messages.error(request, "La venta solicitada no existe.")
+        return redirect('ventas')
+
+@login_required
+def ver_detalle_venta(request, cod_ven):
+    """
+    Vista para mostrar el detalle de una venta específica
+    """
+    try:
+        # Obtener la venta
+        venta = Venta.objects.get(cod_ven=cod_ven)
+        
+        # Obtener los detalles de animales relacionados con esta venta
+        detalles_animales = DetVen.objects.filter(cod_ven=venta)
+        
+        # Pasar los datos al contexto
+        context = {
+            'venta': venta,
+            'detalles_animales': detalles_animales
+        }
+        
+        return render(request, 'detalle_venta.html', context)
+    except Venta.DoesNotExist:
+        messages.error(request, "La venta solicitada no existe.")
+        return redirect('ventas')
+           
+@login_required
+def cancelar_venta(request):
+    """Vista para manejar la cancelación del formulario de venta"""
+    if request.method == 'POST':
+        messages.info(request, "Registro de venta cancelado")
+        return redirect('ventas')
+    else:
+        # Si no es un POST request, redirigir a la página de compras
+        return redirect('ventas')
+
+@login_required
+def contacto(request):
+    # Obtener ID del administrador desde la sesión
+    usuario_id = request.session.get('usuario_id')
+    
+    # Verificar que el usuario es un administrador
+    usuario = Administrador.objects.get(pk=usuario_id)
+
+    # Iniciar con todos los contactos del administrador
+    contactos = Contacto.objects.filter(id_adm=usuario)
+
+    # Obtener parámetros de búsqueda y filtrado
+    busqueda = request.GET.get('busqueda', '')
+    tipo_filtro = request.GET.get('tipo_filtro', '')
+    valor_filtro = request.GET.get('valor', '')  # Nota: el HTML usa 'valor', no 'valor_filtro'
+    
+    # Variable para almacenar el tipo de búsqueda detectado
+    tipo_busqueda = None
+    
+    # Aplicar filtros de búsqueda si existe un término
+    if busqueda:
+        from django.db.models import Q
+        
+        # Intentar detectar si la búsqueda es por cargo o por nombre
+        if any(cargo in busqueda.lower() for cargo in ['proveedor', 'veterinario', 'comprador']):
+            contactos = contactos.filter(cargo__icontains=busqueda)
+            tipo_busqueda = "cargo"
+        else:
+            # Buscar en ambos campos con preferencia al nombre
+            contactos = contactos.filter(
+                Q(nombre__icontains=busqueda)
+            )
+            tipo_busqueda = "nombre"
+    
+    # Aplicar filtro por cargo si se ha seleccionado
+    if tipo_filtro == 'Cargo' and valor_filtro:
+        contactos = contactos.filter(cargo__icontains=valor_filtro)
+    
+    # Verificar si no hay contactos y reiniciar el AUTO_INCREMENT
+    contactos_count = Contacto.objects.filter(id_adm=usuario).count()
+    if contactos_count == 0:
+        with connection.cursor() as cursor:
+            table_documento = Contacto._meta.db_table
+            cursor.execute(f"ALTER TABLE {table_documento} AUTO_INCREMENT = 1;")
+    
+     # Agrega esta función para asignar el cargo a la imagen correspondiente
+    def obtener_imagen_cargo(cargo):
+            
+        cargo = cargo.lower()
+        
+        if 'proveedor' in cargo:
+            return 'img/proveedor_icon.png'
+        elif 'veterinario' in cargo:
+            return 'img/veterinario_icon.png'
+        elif 'comprador' in cargo:
+            return 'img/comprador_icon.png'
+        # Añade más tipos de cargo según sea necesario
+    
+    # Enriquecer la consulta de contactos con rutas de imágenes
+    for contacto in contactos:
+        contacto.imagen = obtener_imagen_cargo(contacto.cargo)
+
+    # Renderizar la plantilla con el contexto
+    return render(request, 'paginas/contacto.html', {
+        "contactos": contactos,
+        "busqueda": busqueda,
+        "current_page_name": "Contactos",
+        "tipo_filtro": tipo_filtro,
+        "valor_filtro": valor_filtro,
+        "tipo_busqueda": tipo_busqueda
     })
 
+@login_required
+def registrar_contacto(request):
+    if request.method == "POST":
+        # Obtener el ID del administrador actual desde la sesión
+        usuario_id = request.session.get('usuario_id')
+        
+        try:
+            # Obtener la instancia del administrador
+            administrador = Administrador.objects.get(pk=usuario_id)
+
+            # Verificar si no hay contactos y reiniciar el AUTO_INCREMENT
+            contactos_count = Contacto.objects.filter(id_adm=usuario_id).count()
+            if contactos_count == 1:
+                with connection.cursor() as cursor:
+                    table_contacto = Contacto._meta.db_table
+                    cursor.execute(f"ALTER TABLE {table_contacto} AUTO_INCREMENT = 1;")
+            
+            nombre = request.POST.get("nombre")
+            cargo = request.POST.get("cargo")
+            correo = request.POST.get("correo")
+            telefono = request.POST.get("telefono")
+            
+            # Crear y guardar el nuevo animal
+            nuevo_contacto = Contacto(
+                cargo=cargo,
+                nombre=nombre,
+                correo=correo,
+                telefono=telefono,
+                id_adm=administrador
+            )
+            nuevo_contacto.save()
+            
+            messages.success(request, f"¡Contacto registrado con éxito!")
+            
+        except Administrador.DoesNotExist:
+            messages.error(request, "Error: No se pudo encontrar el administrador.")
+        except ValueError:
+            messages.error(request, "Error: Valores inválidos en el formulario. Verifica los datos ingresados.")
+        except Exception as e:
+            messages.error(request, f"Error al registrar el contacto: {str(e)}")
+        
+        return redirect('contacto')
+    
+    return redirect('contacto')
+
+@login_required
+def editar_contacto(request, id_cont):
+    # Obtener el ID del administrador actual desde la sesión
+    usuario_id = request.session.get('usuario_id')
+    
+    # Asumiendo que debes usar un modelo Contacto, no Animal
+    contacto = get_object_or_404(Contacto, id_cont=id_cont, id_adm=usuario_id)
+    
+    if request.method == "POST":
+        # Procesar el formulario de edición
+        try:
+            nombre = request.POST.get("nombre")
+            cargo = request.POST.get("cargo")
+            correo = request.POST.get("correo")
+            telefono = request.POST.get("telefono")
+            
+            # Actualizar los campos del contacto
+            contacto.nombre = nombre
+            contacto.cargo = cargo
+            contacto.correo = correo
+            contacto.telefono = telefono
+            
+            # Guardar los cambios
+            contacto.save()
+            
+            messages.success(request, f"¡Contacto #{id_cont} actualizado con éxito!")
+            return redirect('contacto')
+            
+        except ValueError:
+            messages.error(request, "Error: Valores inválidos en el formulario. Verifica los datos ingresados.")
+        except Exception as e:
+            messages.error(request, f"Error al actualizar el contacto: {str(e)}")
+    
+    # Si es GET o hubo error en POST, mostrar el formulario de edición
+    return render(request, "paginas/contacto.html", {
+        "contacto": contacto,
+        "current_page_name": "Editar Contacto"
+    })
+
+@login_required
+def eliminar_contacto(request, id_cont):
+    if request.method == "POST":
+        # Obtener el ID del administrador actual desde la sesión
+        usuario_id = request.session.get('usuario_id')
+        
+        try:
+            # Obtener el animal asegurándose que pertenezca al administrador actual
+            contacto = get_object_or_404(Contacto, id_cont=id_cont, id_adm=usuario_id)
+            
+            # Guardar el código del animal para el mensaje
+            id_contacto= id_cont
+            
+            # Eliminar el animal
+            contacto.delete()
+            
+            messages.success(request, f"Contacto #{id_contacto} eliminado con éxito!")
+            
+        except Animal.DoesNotExist:
+            messages.error(request, "Error: No se encontró el Contacto.")
+        except Exception as e:
+            messages.error(request, f"Error al eliminar el Contacto: {str(e)}")
+        
+        return redirect('contacto')
+    
+    # Si no es un POST, redirigir al inventario
+    return redirect('contacto')
 
 def logout(request):
     # Clear all session data

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+{% load static %}
+{% load humanize %}
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle de Venta #{{ venta.cod_ven }}</title>
+    {% block css %}
+    <link href="{% static 'css/ventas_pdf.css' %}" rel="stylesheet">
+    {% endblock %}
+</head>
+<body>
+    <div class="header">
+        <h1>Detalle de Venta #{{ venta.cod_ven }}</h1>
+        <button class="descargar" onclick="window.print()">Imprimir</button>
+    </div>
+
+    <h2>Información General</h2>
+    <table class="info-table">
+        <tr>
+            <th>Fecha:</th>
+            <td>{{ venta.fecha|date:"d/m/Y" }}</td>
+        </tr>
+        <tr>
+            <th>Cliente:</th>
+            <td>{{ venta.cliente }}</td>
+        </tr>
+        <tr>
+            <th>Cantidad de Animales:</th>
+            <td>{{ venta.cantidad_animales }}</td>
+        </tr>
+        <tr>
+            <th>Precio Total:</th>
+            <td>${{ venta.precio_total|floatformat:0|intcomma }}</td>
+        </tr>
+    </table>
+    
+    <h2>Detalles de Animales</h2>
+    <table class="animals-table">
+        <thead>
+            <tr>
+                <th>Código Animal</th>
+                <th>Edad</th>
+                <th>Peso</th>
+                <th>Precio Unitario</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detalle in venta.detven_set.all %}
+                <tr>
+                    <td>{{ detalle.cod_ani }}</td>
+                    <td>{{ detalle.edad_aniven }} meses</td>
+                    <td>{{ detalle.peso_aniven }} kg</td>
+                    <td>${{ detalle.precio_uni|floatformat:0|intcomma }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No hay animales registrados en esta venta.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script src="{% static 'js/imprimir.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,331 @@
+:root {
+    --color-fondo: #f8dfb3;
+    --color-primario: #D3B177;
+    --color-secundario: #947643;
+    --gradient-header: linear-gradient(90deg, rgba(211,177,119,1) 25%, rgba(109,92,62,1) 100%);
+}
+
+
+.mensajes-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    max-width: 500px;
+    z-index: 9999;
+    text-align: center;
+}
+
+.alert {
+    padding: 15px 20px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-weight: 500;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.alert-success {
+    background-color: #dff0d8;
+    border: 1px solid #d6e9c6;
+    color: #3c763d;
+}
+
+.alert-danger {
+    background-color: #f2dede;
+    border: 1px solid #ebccd1;
+    color: #a94442;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Opcion para cerrar el mensaje */
+.alert {
+    position: relative;
+    padding-right: 30px; /* Espacio para el botón */
+}
+
+.close-btn {
+    position: absolute;
+    top: 2px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: inherit;
+}
+
+
+/* Sección de avatar - ahora posicionada a la izquierda del formulario */
+.avatar-section {
+    position: absolute;
+    top: 150px; /* Ajusta según sea necesario para alinearlo con el formulario */
+    left: 22%; /* Ajusta según sea necesario */
+    z-index: 2; /* Para asegurar que esté encima si hay algún solapamiento */
+}
+
+.avatar-circle {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background-color: #e5e5e5;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid #d4be91;
+}
+
+.avatar-placeholder i {
+    font-size: 48px;
+    color: #888;
+}
+
+/* Estilos para el formulario de perfil */
+.perfil-container {
+    max-width: 700px;
+    background-color: #f5e6c8;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0d0b0;
+    margin-top: 30px; /* Cambiado a positivo */
+    margin-left: 27%;
+    margin-bottom: 3%; /* Para dar espacio al footer */
+    padding: 20px; /* Añadido padding general */
+}
+
+/* Sección del formulario */
+.form-section {
+    padding: 15px 15px 15px 120px; /* Aumentado el padding izquierdo para dar espacio al avatar */
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Divide en dos columnas iguales */
+    gap: 20px; /* Espacio entre los elementos */
+    border-bottom: 2px solid #e0e0e0;
+    margin-top: -15px;
+}
+
+.campo-grupo label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+}
+
+.input-con-icono {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-con-icono input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    font-size: 14px;
+    height: 35px;
+}
+
+.edit-icon {
+    position: absolute;
+    right: 10px;
+    color: #888;
+    cursor: pointer;
+}
+
+/* Sección de módulos */
+.modulos-seccion {
+    padding: 0 15px;
+    margin-top: 19px;
+    margin-bottom: 25px;
+    margin-left: 5%;
+}
+
+.modulos-seccion h4 {
+    font-weight: 500; 
+    font-size: 20px;
+    color: #333;
+    margin-left: 13%;   
+}
+
+.modulos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 13px;
+    font-size: 15px;
+}
+
+.modulo-item {
+    background-color: white;
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.modulo-item:hover {
+    transform: scale(1.02);
+    transition: all 0.3s ease;
+}
+/* Personalización del checkbox */
+.modulo-item input[type="checkbox"] {
+    margin-right: 10px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 15px;
+    height: 15px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    outline: none;
+    position: relative;
+}
+
+/* Color de fondo cuando está marcado */
+.modulo-item input[type="checkbox"]:checked {
+    background-color:var(--color-primario);
+    border-color: var(--color-primario);
+}
+
+/* Chulito blanco cuando está marcado */
+.modulo-item input[type="checkbox"]:checked:after {
+    content: '✓';
+    position: absolute;
+    color: white;
+    font-size: 12px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Separador con borde */
+.separador-boton {
+    width: 100%;
+    border-top: 2px solid #e0e0e0;
+    height: 1px; /* Altura mínima para que se vea la línea */
+    margin-top: -5px;
+
+}
+
+/* Ajuste en botón de guardar para que tenga espacio arriba */
+.boton-seccion {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px; /* Reducido porque ya tenemos el separador */
+    width: 100%;
+}
+
+/* Botón de guardar */
+.boton-seccion {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.btn-guardar {
+    background-color: var(--color-secundario);
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-guardar:hover {
+    background-color: var(--color-primario);
+    transform: scale(1.05);
+}
+
+.modal-content {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0d0b0;
+    width: 90%;
+    height: 30%;
+    text-align: center;
+    margin-top: 35%;
+    left: 10%;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: center;    
+}
+.btn{
+    border-color: #979595a6;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+.btn:hover {
+    background-color: var(--color-secundario);
+    color: white;
+    transform: scale(1.05);
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .avatar-section {
+        position: relative;
+        top: auto;
+        left: auto;
+        text-align: center;
+        margin: 20px auto;
+    }
+    
+    .avatar-circle {
+        margin: 0 auto;
+    }
+    
+    .form-section {
+        padding: 15px;
+    }
+    
+    .cuenta {
+        margin-left: 10%;
+        max-width: 80%;
+    }
+    
+    .perfil-container {
+        margin-left: 10%;
+        max-width: 80%;
+    }
+}
+
+@media (max-width: 768px) {
+    .cuenta {
+        margin-left: 5%;
+        max-width: 90%;
+    }
+    
+    .perfil-container {
+        margin-left: 5%;
+        max-width: 90%;
+    }
+    
+    .form-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .modulos-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -244,6 +244,24 @@ header {
     color: #000000;
 }
 
+/* Elimina el subrayado de los enlaces en los recordatorios */
+.recordatorios-dropdown a {
+    text-decoration: none;
+}
+
+/* Específicamente para la descripción del evento */
+.event-info a,
+.event-info a .event-description {
+    text-decoration: none !important;
+    color: inherit;
+}
+
+/* Asegura que no haya subrayado incluso al pasar el mouse */
+.event-info a:hover,
+.event-info a:hover .event-description {
+    text-decoration: none !important;
+}
+
 /* === MENÚ DE PERFIL === */
 #perfil {
     background-color: #ffffffd3;
@@ -274,12 +292,13 @@ footer {
     width: 100vw;
     height: 13vh;
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
 }
 
-/* Botón de soporte */
-.soporte {
-    left: 85%;
-    position: relative;
+.derechos {
+    margin: 0;
 }
 
 .soporte button {
@@ -291,7 +310,6 @@ footer {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     color: #000000;
     cursor: pointer;
-    margin-top: 30px;
 }
 
 .soporte button:hover {
@@ -308,9 +326,7 @@ footer {
         margin-left: 20px;
     }
 
-    .soporte {
-        left: 85%;
-    } 
+    /* Se elimina la regla .soporte { left: 85%; } */
 }
 
 /* Desktop Computers (1441px and above) */
@@ -321,9 +337,7 @@ footer {
         margin-left: 20px;
     }
     
-    .soporte {
-        left: 85%;
-    }
+    /* Se elimina la regla .soporte { left: 85%; } */
     
     footer {
         margin-top: 5%;

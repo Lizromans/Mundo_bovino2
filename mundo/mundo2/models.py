@@ -85,22 +85,26 @@ class Contacto(models.Model):
 
 class DetCom(models.Model):
     cod_detcom = models.AutoField(primary_key=True)
-    cod_com = models.ForeignKey(Compra, models.DO_NOTHING, db_column='cod_com')
+    cod_com= models.ForeignKey('Compra', models.DO_NOTHING, db_column='cod_com')
+    cod_ani = models.IntegerField(255)
+    edad_anicom = models.IntegerField(255)
     peso_anicom = models.FloatField(db_column='peso_aniCom')  # Field name made lowercase.
     precio_uni = models.FloatField()
-    id_ani = models.ForeignKey(Animal, models.DO_NOTHING, db_column='id_ani')
-
+    
     class Meta:
         managed = False
         db_table = 'det_com'
 
+    def __str__(self):
+        return f"Detalle de Compra {self.cod_com.cod_com} - Animal {self.cod_ani}"
 
 class DetVen(models.Model):
     cod_detven = models.AutoField(primary_key=True)
     cod_ven = models.ForeignKey('Venta', models.DO_NOTHING, db_column='cod_ven')
-    peso_aniven = models.FloatField(db_column='peso_aniVen')  # Field name made lowercase.
+    cod_ani = models.IntegerField(255)
+    edad_aniven = models.IntegerField()  # Field name made lowercase.
+    peso_aniven = models.FloatField()  # Field name made lowercase.
     precio_uni = models.FloatField()
-    id_ani = models.ForeignKey(Animal, models.DO_NOTHING, db_column='id_ani')
 
     class Meta:
         managed = False
@@ -130,7 +134,6 @@ class Venta(models.Model):
     nom_cli = models.CharField(max_length=255)
     cantidad = models.IntegerField()
     fecha = models.DateField()
-    lugar = models.CharField(max_length=50)
     precio_total = models.FloatField()
     id_adm = models.ForeignKey(Administrador, models.DO_NOTHING, db_column='id_adm')
     

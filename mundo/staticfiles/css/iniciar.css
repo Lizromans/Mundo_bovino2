@@ -1,0 +1,366 @@
+:root {
+    --color-fondo: #f8dfb3;
+    --color-primario: #D3B177;
+    --color-secundario: #947643;
+    --gradient-header: linear-gradient(90deg, rgba(211,177,119,1) 25%, rgba(109,92,62,1) 100%);
+}
+
+.mensajes-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    max-width: 500px;
+    z-index: 9999;
+    text-align: center;
+}
+
+.alert {
+    padding: 15px 20px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-weight: 500;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.alert-success {
+    background-color: #dff0d8;
+    border: 1px solid #d6e9c6;
+    color: #3c763d;
+}
+
+.alert-danger {
+    background-color: #f2dede;
+    border: 1px solid #ebccd1;
+    color: #a94442;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Opcion para cerrar el mensaje */
+.alert {
+    position: relative;
+    padding-right: 30px; /* Espacio para el botón */
+}
+
+.close-btn {
+    position: absolute;
+    top: 2px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.mensaje{
+    background-color: #D3B177;
+    box-shadow: 0 4px 6px rgba(0, 0, 0.3, 0.3);
+    height: 310px;
+    margin: 75px;
+    display: flex;
+    width: 500px;
+    border-radius: 30px;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    left: 10%;
+    margin-top: 7%;
+    margin-bottom: 7%;
+}
+
+
+h1{
+    font-family: 'Courier New', Courier, monospace;
+    color: #000000;
+    font-style: oblique;
+    font-size: 17px;
+    display: flex;
+    position: absolute;
+    transform: translate(0%, 0%);
+    top: 30px;
+    left: 20px;
+    right: 20px;
+    justify-content: center;
+    text-align: center;
+}
+
+.autenticacion{
+    display: grid;
+    justify-content: center;
+    margin-top: 65px;
+    position: relative;
+    left: 2%;
+    font-family: 'BabelSans', 
+}
+
+#inicio{
+    background-color: #947643;
+    height: 39px;
+    width: 170px;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0.3, 0.3);
+    margin-top: 27px;
+    color: #ffffff;
+    cursor: pointer;
+    margin-left: 155px;
+}
+
+#inicio:hover{
+    background-color: #D3B17743;
+    color: #000000;
+}
+
+#registro{
+    background-color: #D3B177;
+    height: 39px;
+    width: 170px;
+    border-radius: 20px;
+    border-color: #0e0b064b;
+    box-shadow: 0 4px 6px rgba(0, 0, 0.3, 0.3);
+    margin-top: 27px;
+    color: #000000;
+    cursor: pointer;
+    margin-left: 155px;
+    
+}
+
+#registro:hover{
+    background-color: #947643;
+    color: #ffffff;
+}
+
+.formulario {
+    background-color: #D3B177;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    height: 300px;
+    border-radius: 30px;
+    min-width: 380px;
+    margin-top: -40px;
+    position: relative;
+    left: 60%;
+}
+
+.datos {
+   padding-top: 15px;
+    display: grid;
+    margin-right: 20px;
+    font-size: 15px;
+    margin-left: 25px;
+    font-family: 'BabelSans'; 
+    position: relative;
+    top: 5%;
+}
+
+input[type="submit"] {
+    background-color: #D3B177;
+    border-radius: 20px;
+    height: 35px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    border-color: #947643;
+    cursor: pointer;
+    width: 320px;
+}
+
+input[type="submit"]:hover {
+    background-color: #947643;
+    color: #ffffff;
+}
+input[type="text"],
+input[type="password"] {
+    border-radius: 7px;
+    border: 1px solid #00000070;
+    height: 35px; /* Aumentado para mejor apariencia */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    padding: 5px; /* Añadido para un poco de espacio interno */
+    width: 320px;
+}
+
+#olvido{
+    font-size: 12px;
+    color: black;
+    margin-bottom: 5%;
+    position: relative;
+    left: 3%;
+}
+
+.form-check-input { 
+    appearance: none; 
+    -webkit-appearance: none; 
+    width: 16px; 
+    height: 16px; 
+    border: 1px solid #ccc; 
+    border-radius: 3px; 
+    outline: none; 
+    width: 12px; 
+    height: 12px; 
+    cursor: pointer; 
+    position: relative; 
+    background-color: #fff; 
+    border: 1px solid #ccc; 
+    border-radius: 3px; 
+    outline: none; 
+    margin-top: 6px;
+} 
+.form-check-input:checked { 
+    background-color: #947643; 
+    border-color: #947643; 
+}
+
+.form-check-label {
+    color: #000000; /* Cambia el color del texto */
+    font-size: 12px; /* Cambia el tamaño de la fuente */
+    margin-left: -9px;
+}
+
+.form-check-input:checked::after { 
+    content: '';
+    position: absolute; 
+    width: 4px; 
+    height: 8px; 
+    border-width: 0 2px 2px 0; 
+    transform: rotate(45deg); 
+}
+
+
+/* Nuevo estilo para los contenedores de inputs y labels */
+.form-group {
+    position: relative;
+}
+
+/* Nuevo estilo para los mensajes de error */
+.error-container {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    font-size: 14px;
+    padding: 4px 8px;
+    position: absolute;
+    left: -160px;
+    top: 70%;
+    transform: translateY(-50%);
+    width: 150px;
+    z-index: 10;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Flecha para el contenedor de error */
+.error-container:after {
+    content: '';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 5px 0 5px 10px;
+    border-style: solid;
+    border-color: transparent transparent transparent #f8d7da;
+}
+
+/* Eliminar viñetas y estilos default de listas de errores */
+.error-container ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.error-container li {
+    padding: 0;
+    margin: 0;
+}
+
+/* Popup message styling */
+.popup-message {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    padding: 25px;
+    max-width: 400px;
+    width: 90%;
+    position: relative;
+    animation: popIn 0.3s ease-out;
+}
+
+/* Success message styling */
+.popup-message.success {
+    box-shadow: 0 4px 6px rgba(0, 0, 0.3, 0.3);
+}
+
+/* Error message styling */
+.popup-message.error {
+    border-left: 8px solid #721c24;
+}
+
+/* Message content */
+.popup-content {
+    font-family: 'BabelSans', sans-serif;
+    font-size: 16px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Close button */
+.popup-close {
+    background-color: #947643;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-family: 'BabelSans', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto;
+    transition: background-color 0.3s;
+}
+
+.popup-close:hover {
+    background-color: #D3B177;
+    color: #000000;
+}
+
+/* Animation for popup appearance */
+@keyframes popIn {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+/* Laptops (1024px a 1340px) */
+@media screen and (min-width: 1024px) and (max-width: 1340px) {
+
+    .mensaje {
+        width: 500px;
+    }
+
+    .formulario {
+        min-width: 400px;
+    }
+}
+
+/* Desktop Computers (1600px y above) */
+@media screen and (min-width: 1400px) {
+    .mensaje {
+        margin-top: 130px;
+        width: 500px;
+    }
+
+    .formulario {
+        min-width: 400px;
+    }
+
+}
+

@@ -35,12 +35,18 @@
                         </a>
                         {% endif %}
                         
-                        {% if current_page_name != "Registro de Ventas" %}
-                        <a class="dropdown-item" id="dropdown-item" href="#"><b>Registro de Ventas</b>
-                            <img src="{% static 'img/icons2.png' %}" alt="Registro de Ventas" style="margin-left: 8px;">
+                        {% if current_page_name != "Registro de Compras" %}
+                        <a class="dropdown-item" id="dropdown-item" href="{% url 'compras' %}"><b>Registro de Compras</b>
+                            <img src="{% static 'img/icons2.png' %}" alt="Registro de Compras" style="margin-left: -4px;">
                         </a>
                         {% endif %}
                         
+                        {% if current_page_name != "Registro de Ventas" %}
+                        <a class="dropdown-item" id="dropdown-item" href="{% url 'ventas' %}"><b>Registro de Ventas</b>
+                            <img src="{% static 'img/icons2.png' %}" alt="Registro de Compras" style="margin-left: -4px;">
+                        </a>
+                        {% endif %}
+
                         {% if current_page_name != "Calendario" %}
                         <a class="dropdown-item" id="dropdown-item" href="{% url 'calendario' %}"><b>Calendario</b>
                             <img src="{% static 'img/icons3.png' %}" alt="Calendario" style="margin-left: 65px;">
@@ -53,9 +59,9 @@
                         </a>
                         {% endif %}
                         
-                        {% if current_page_name != "Agenda" %}
-                        <a class="dropdown-item" id="dropdown-item" href="#"><b>Agenda</b>
-                            <img src="{% static 'img/icons5.png' %}" alt="Contactos" style="margin-left: 89px;">
+                        {% if current_page_name != "Contactos" %}
+                        <a class="dropdown-item" id="dropdown-item" href="{% url 'contacto' %}"><b>Contactos</b>
+                            <img src="{% static 'img/icons5.png' %}" alt="Contactos" style="margin-left: 74px;">
                         </a>
                         {% endif %}
                     </div>
@@ -271,6 +277,7 @@
     
     <div>
         <footer>
+            <p class="derechos">© 2025 Mundo Bovino. Todos los derechos reservados.</p>
             <div class="soporte">
                 <button id="soporte" onclick="window.location.href='{% url 'preguntasfrecuentes' %}';"> FAQ </button>
             </div>

@@ -43,12 +43,15 @@ footer {
     width: 100vw;
     height: 13vh;
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
 }
 
-.soporte{
-    left: 85%;
-    position: relative;
+.derechos {
+    margin: 0;
 }
+
 .soporte button {
     background-color: var(--color-primario);
     height: 30px;
@@ -58,8 +61,6 @@ footer {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     color: #000000;
     cursor: pointer;
-    margin-top: 30px;
-    
 }
 
 .soporte button:hover {

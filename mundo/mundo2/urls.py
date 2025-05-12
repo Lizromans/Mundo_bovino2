@@ -26,7 +26,23 @@ urlpatterns = [
     path('agregar/', views.agregar_documento, name='agregar_documento'),
     path('editar_documento/<int:documento_id>/', views.editar_documento, name='editar_documento'),
     path('eliminar-documento/<int:documento_id>/', views.eliminar_documento, name='eliminar_documento'),
-]
+    path('compras/', views.compras, name='compras'),
+    path('crear_compra/', views.crear_compra, name='crear_compra'),
+    path('api/siguiente-codigo-animal/', views.api_siguiente_codigo_animal, name='api_siguiente_codigo_animal'),
+    path('eliminar_compra/<int:compra_id>/', views.eliminar_compra, name='eliminar_compra'),
+    path('cancelar_compra/', views.cancelar_compra, name='cancelar_compra'), 
+    path('compra_pdf/<int:compra_id>/', views.compra_pdf, name='compra_pdf'),
+    path('ventas/', views.ventas, name='ventas'),
+    path('crear_venta/', views.crear_venta, name='crear_venta'),
+    path('eliminar_venta/<int:venta_id>/', views.eliminar_venta, name='eliminar_venta'),
+    path('detalle_venta/<int:venta_id>/', views.detalle_venta, name='detalle_venta'),
+    path('cancelar_venta/', views.cancelar_venta, name='cancelar_venta'),
+    path('descargar_venta/<int:venta_id>/', views.descargar_detalle_venta, name='descargar_venta'),
+    path('contacto/', views.contacto, name='contacto'),
+    path('registrar_contacto/', views.registrar_contacto, name='registrar_contacto'),
+    path('editar-contacto/<int:id_cont>/', views.editar_contacto, name='editar_contacto'),
+    path('eliminar-contacto/<int:id_cont>/', views.eliminar_contacto, name='eliminar_contacto'),
+    ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

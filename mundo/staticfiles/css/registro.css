@@ -1,0 +1,288 @@
+:root {
+    --color-fondo: #f8dfb3;
+    --color-primario: #D3B177;
+    --color-secundario: #947643;
+    --gradient-header: linear-gradient(90deg, rgba(211,177,119,1) 25%, rgba(109,92,62,1) 100%);
+}
+
+.mensaje{
+    background-color: #D3B177;
+    box-shadow: 0 4px 6px rgba(0, 0, 0.3, 0.3);
+    height: 310px;
+    margin: 75px;
+    display: flex;
+    width: 500px;
+    border-radius: 30px;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    left: 10%; 
+    margin-top: 7%;
+    margin-bottom: 7%;
+}
+
+h1{
+    font-family: 'Courier New', Courier, monospace;
+    color: #000000;
+    font-style: oblique;
+    font-size: 17px;
+    display: flex;
+    position: absolute;
+    transform: translate(0%, 0%);
+    top: 30px;
+    left: 20px;
+    right: 20px;
+    justify-content: center;
+    text-align: center;
+}
+
+.autenticacion{
+    display: grid;
+    justify-content: center;
+    margin-top: 65px;
+    position: relative;
+    left: 2%;
+    font-family: 'BabelSans', 
+}
+
+#registro{
+    background-color: #947643;
+    height: 39px;
+    width: 170px;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0.3, 0.3);
+    margin-top: 27px;
+    color: #ffffff;
+    cursor: pointer;
+    margin-left: 155px;
+}
+
+#registro:hover{
+    background-color: #D3B17743;
+    color: #000000;
+}
+
+#inicio{
+    background-color: #D3B177;
+    height: 39px;
+    width: 170px;
+    border-radius: 20px;
+    border-color: #0e0b064b;
+    box-shadow: 0 4px 6px rgba(0, 0, 0.3, 0.3);
+    margin-top: 27px;
+    color: #000000;
+    cursor: pointer;
+    margin-left: 155px;
+    
+}
+
+#inicio:hover{
+    background-color: #947643;
+    color: #ffffff;
+}
+
+.formulario {
+    background-color: #D3B177;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    height: 368px;
+    border-radius: 30px;
+    min-width: 380px;
+    position: relative;
+    left: 60%;
+}
+
+.datos {
+    margin: 15px;
+    display: grid;
+    margin-right: 10px;
+    font-size: 15px;
+    margin-top: 2px;
+    font-family: 'BabelSans', 
+}
+/* Estilos para el botón tipo submit */
+/* Estilos para el botón tipo submit */
+input[type="submit"] {
+    background-color: #D3B177;
+    border-radius: 20px;
+    height: 27px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    border-color: #947643;
+    cursor: pointer;
+    width: 320px;
+    margin-left: 5px;
+    margin-top: 10px;
+}
+
+input[type="submit"]:hover {
+    background-color: #947643;
+    color: #ffffff;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    border-radius: 7px;
+    border-color: #00000070;
+    height: 28px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    width: 320px;
+ 
+}
+/* Nuevo estilo para los contenedores de inputs y labels */
+.form-group {
+    position: relative;
+}
+
+/* Nuevo estilo para los mensajes de error */
+.error-container {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    font-size: 10px;
+    padding: 4px 8px;
+    position: absolute;
+    left: -160px;
+    top: 70%;
+    transform: translateY(-50%);
+    width: 150px;
+    z-index: 10;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Flecha para el contenedor de error */
+.error-container:after {
+    content: '';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 5px 0 5px 10px;
+    border-style: solid;
+    border-color: transparent transparent transparent #f8d7da;
+}
+
+/* Eliminar viñetas y estilos default de listas de errores */
+.error-container ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.error-container li {
+    padding: 0;
+    margin: 0;
+}
+
+/* Popup message styling */
+.popup-message {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    padding: 25px;
+    max-width: 400px;
+    width: 90%;
+    position: relative;
+    animation: popIn 0.3s ease-out;
+}
+
+/* Success message styling */
+.popup-message.success {
+    box-shadow: 0 4px 6px rgba(0, 0, 0.3, 0.3);
+}
+
+/* Error message styling */
+.popup-message.error {
+    border-left: 8px solid #721c24;
+}
+
+/* Message content */
+.popup-content {
+    font-family: 'BabelSans', sans-serif;
+    font-size: 16px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Close button */
+.popup-close {
+    background-color: #947643;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-family: 'BabelSans', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto;
+    transition: background-color 0.3s;
+}
+
+.popup-close:hover {
+    background-color: #D3B177;
+    color: #000000;
+}
+
+/* Animation for popup appearance */
+@keyframes popIn {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Laptops (1024px a 1340px) */
+@media screen and (min-width: 1024px) and (max-width: 1340px) {
+    .mensaje {
+        width: 450px;
+    }
+
+    .formulario {
+        min-width: 370px;
+    }
+    
+    .error-container {
+        left: -140px;
+        width: 130px;
+    }
+}
+
+/* Desktop Computers (1600px y above) */
+@media screen and (min-width: 1400px) {
+    .mensaje {
+        margin-top: 130px;
+        width: 500px;
+    }
+
+    .formulario {
+        min-width: 400px;
+    }
+    
+    .error-container {
+        left: -160px;
+        width: 150px;
+    }
+}
+
+/* Ajuste para pantallas más pequeñas donde el error no cabría a la izquierda */
+@media screen and (max-width: 1023px) {
+    .error-container {
+        left: 0;
+        top: -20px;
+        transform: none;
+        width: 90%;
+    }
+    
+    .error-container:after {
+        border-width: 0 5px 10px 5px;
+        border-color: transparent transparent #f8d7da transparent;
+        right: auto;
+        top: auto;
+        bottom: -10px;
+        left: 10px;
+        transform: none;
+    }
+}
