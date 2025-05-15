@@ -822,8 +822,9 @@ textarea.form-control {
    15. FILTRADO Y BÚSQUEDA
    ======================== */
 .filtrado-container {
-    margin-left: 80%;
+    margin-left: 70%;
     padding: 2px;
+    width: 100%;
 }
 
 .filtrado-container .form-filtrado {

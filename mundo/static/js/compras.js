@@ -328,3 +328,34 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error(`¡ALERTA! Se encontraron ${contadorComprasJS} scripts de compras.js incluidos`);
     }
 });
+
+// --- NUEVA FUNCIONALIDAD PARA EDITAR COMPRAS ---
+    
+    // Escuchar cambios en los precios unitarios para recalcular el precio total en formularios de edición
+    document.querySelectorAll('.precio-uni-edit').forEach(input => {
+        input.addEventListener('change', function() {
+            const compraId = this.getAttribute('data-compra');
+            recalcularPrecioTotal(compraId);
+        });
+    });
+    
+    // Función para recalcular el precio total de una compra en edición
+    function recalcularPrecioTotal(compraId) {
+        const modal = document.getElementById('editModal-' + compraId);
+        let total = 0;
+        
+        // Sumar todos los precios unitarios
+        modal.querySelectorAll('.precio-uni-edit').forEach(input => {
+            total += parseFloat(input.value || 0);
+        });
+        
+        // Actualizar el precio total
+        const precioTotalInput = document.getElementById('precio_total-edit-' + compraId);
+        precioTotalInput.value = total.toFixed(0);
+    }
+    
+    // Inicializar todos los modales de edición con sus totales correctos
+    document.querySelectorAll('[id^="editModal-"]').forEach(modal => {
+        const compraId = modal.id.replace('editModal-', '');
+        recalcularPrecioTotal(compraId);
+    });

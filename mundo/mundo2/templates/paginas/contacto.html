@@ -109,8 +109,8 @@
             <div class="col-md-3 mb-3">
                 <div class="fichas">
                     <!-- Imagen del toro -->
-                    <div class="toro-img">
-                        <img src="{% static contacto.imagen %}" alt="toro">
+                    <div class="contacto-img">
+                        <img src="{% static contacto.imagen %}" alt="contacto">
                     </div>
                     <div class="info-detalle">
                         <p><b>Nombre:</b> {{ contacto.nombre }}</p>
@@ -227,8 +227,11 @@
                     </form>            
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn" data-bs-dismiss="modal">Cancelar registro</button>
-                    <button type="submit" class="btn" form="animal">Registrar contacto</button>
+                    <form action="{% url 'cancelar_contacto' %}" method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn">Cancelar</button>
+                    </form>
+                    <button type="submit" class="btn" form="formulario-compra">Registrar Contacto</button>
                 </div>
             </div>
         </div>

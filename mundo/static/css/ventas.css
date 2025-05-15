@@ -8,7 +8,7 @@
 /* Estilos para mensajes de alerta */
 .mensajes-container {
     position: fixed;
-    top: 20px;
+    top: 16%;
     left: 50%;
     transform: translateX(-50%);
     width: 60%;
@@ -72,20 +72,29 @@
     color: inherit;
 }
 
-
 /* Ajustes para el formulario de búsqueda */
 .navbar-form {
     position: relative;
     margin-top: 2%;
-    margin-bottom: 7%;
-    width: 40%;
-    left: 63%;
+    margin-bottom: 3%;
+    width: 100%;
+    margin-left: 18%;
 }
+
 .navbar-form .form-control {
-    height: 37px; /* Puedes ajustar este valor según lo necesites */
+    height: 37px;
     padding-top: 2%;
     padding-bottom: 3px;
+    width: 300px;
+    float: right;
 }
+
+.search-container {
+    position: relative;
+    display: inline-block;
+    margin-right: 1.6%;
+}
+
 .lupa {
     position: absolute; 
     right: 13px; 
@@ -95,78 +104,25 @@
 }
 
 .boton-seccion {
-    position: absolute;
-    right: -82%;
-    top: 2px;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 button {
-    border: none; /* Elimina el borde */
-    background-color: transparent; /* Hace el fondo transparente */
-    color: inherit; /* Opcional: Mantiene el color del texto heredado */
+    border: none;
+    background-color: transparent;
+    color: inherit;
 }
 
 .agregar {
     width: 30px;
     height: 30px;
     cursor: pointer;
+    margin-top: 10%;
 }
 
-/* Ajustes para el formulario de búsqueda */
-.filtrado-container {
-    position: absolute;
-    left: 102%;
-    top: -5%;
-}
-
-/* Estilos específicos para el botón toggle del filtrado */
-.filtrado-container .dropdown-toggle {
-    width: 110px;
-    height: 38px;
-    padding: 6px 13px;
-    border-radius: 10px;
-    background-color: transparent;
-    color: #000000;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    border: 2px solid var(--color-primario)!important;
-    text-align: center;
-    font-weight: bold;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* Estilo para el botón al pasar el mouse */
-.filtrado-container .dropdown-toggle:hover {
-    background-color: #f0f0f0;
-    transition: background-color 0.3s ease;
-}
-
-/* Estilo específico para el menú desplegable del filtrado */
-.filtrado-container #dropdown-filtrar {
-    background-color: #ffffffbb;
-    border-radius: 10px;
-    width: 200px;
-    padding: 8px 0;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border: 1px solid #e0e0e0;
-    margin-top: 5px;
-}
-
-/* Estilos específicos para los items del menú de filtrado */
-.filtrado-container .dropdown-item {
-    padding: 8px 15px;
-    color: #333;
-    font-size: 14px;
-    transition: all 0.2s ease;
-}
-
-/* Hover para los items específicos del filtrado */
-.filtrado-container .dropdown-item:hover {
-    background-color: #c2bebe98;
-    color: #000000;
-    transform: scale(1.05);
-    border-radius: 4px;
+.agregar:hover {
+    transform: scale(1.1);
 }
 
 /* Filtros activos */
@@ -244,7 +200,7 @@ button {
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     padding: 15px;
     position: relative;
-    margin-bottom: 17%;
+    margin-bottom: 25%;
     transition: transform 0.5s ease, box-shadow 0.3s ease;
 }
 
@@ -256,7 +212,6 @@ button {
 /* Estilos para la información principal */
 .info-principal {
     text-align: center;
-    border-bottom: 1px solid #eee;
     padding-bottom: 10px;
     flex-grow: 1;   
 }

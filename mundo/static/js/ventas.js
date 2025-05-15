@@ -231,3 +231,34 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Iniciando actualización inicial del formulario');
     actualizarFormularioAnimales();
 });
+
+// --- NUEVA FUNCIONALIDAD PARA EDITAR VENTAS ---
+    
+    // Escuchar cambios en los precios unitarios para recalcular el precio total en formularios de edición
+    document.querySelectorAll('.precio-uni-edit').forEach(input => {
+        input.addEventListener('change', function() {
+            const ventaId = this.getAttribute('data-venta');
+            recalcularPrecioTotal(ventaId);
+        });
+    });
+    
+    // Función para recalcular el precio total de una venta en edición
+    function recalcularPrecioTotal(ventaId) {
+        const modal = document.getElementById('editModal-' + ventaId);
+        let total = 0;
+        
+        // Sumar todos los precios unitarios
+        modal.querySelectorAll('.precio-uni-edit').forEach(input => {
+            total += parseFloat(input.value || 0);
+        });
+        
+        // Actualizar el precio total
+        const precioTotalInput = document.getElementById('precio_total-edit-' + ventaId);
+        precioTotalInput.value = total.toFixed(0);
+    }
+    
+    // Inicializar todos los modales de edición con sus totales correctos
+    document.querySelectorAll('[id^="editModal-"]').forEach(modal => {
+        const ventaId = modal.id.replace('editModal-', '');
+        recalcularPrecioTotal(ventaId);
+    });

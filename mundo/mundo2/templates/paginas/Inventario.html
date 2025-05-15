@@ -139,7 +139,7 @@
                             </div>
                         </div>
 
-                        <!-- Botones para eliminar y editar animal (POSICIONES CORREGIDAS) -->
+                        <!-- Botones para eliminar y editar animal-->
                         <button type="button" class="btn-editar" data-bs-toggle="modal" data-bs-target="#editModal-{{ animal.cod_ani }}">
                             <img src="{% static 'img/editar.png' %}" alt="editar" width="20">
                         </button>
@@ -276,8 +276,11 @@
                     </form>            
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn" data-bs-dismiss="modal">Cancelar registro</button>
-                    <button type="submit" class="btn" form="animal">Registrar animal</button>
+                    <form action="{% url 'cancelar_animal' %}" method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn">Cancelar</button>
+                    </form>
+                    <button type="submit" class="btn" form="formulario-compra">Registrar Animal</button>
                 </div>
             </div>
         </div>

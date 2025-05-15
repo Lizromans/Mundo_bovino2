@@ -22,36 +22,19 @@
 
     <div class="container">
         <div class="row mb-4">
-            <div class="col-md-8 offset-md-2">
+            <div class="col-md-10 offset-md-1">
                 <form class="navbar-form" role="search" method="GET" action="{% url 'compras' %}">
-                    <div class="form-group">
-                        <!-- Campo de búsqueda con atributo autofocus y oninput para enviar el formulario automáticamente -->
-                        <input type="text" class="form-control" name="busqueda" placeholder="Buscar..." 
-                               value="{{ busqueda }}" autofocus 
-                               onchange="this.form.submit()">
-                        <img src="{% static 'img/lupa.png' %}" class="lupa" alt="lupa">
-                        
-                        <div class="filtrado-container">
-                            <button class="dropdown-toggle" id="toggle" type="button"
-                                    data-bs-toggle="dropdown" role="button"><b>
-                                        <img src="{% static 'img/filtrar.png' %}" alt="filtrar">
-                                        {{ valor_filtro|default:"Filtrar por" }}
-                                    </b>
-                            </button>
-                            <div class="dropdown-menu" id="dropdown-filtrar">
-                                <a class="dropdown-item" href="?{% if busqueda %}busqueda={{ busqueda }}&{% endif %}tipo_filtro=fecha&valor=fecha">
-                                    <b>Fecha de compra</b>
-                                </a>
-                                <a class="dropdown-item" href="?{% if busqueda %}busqueda={{ busqueda }}&{% endif %}tipo_filtro=proveedor&valor=proveedor">
-                                    <b>Proveedor</b>
-                                </a>
-                                <a class="dropdown-item" href="{% url 'compras' %}">
-                                    <b>Limpiar filtros</b>
-                                </a>
-                            </div>
+                    <div class="form-group d-flex justify-content-end">
+                        <!-- Campo de búsqueda movido a la derecha -->
+                        <div class="search-container mr-2">
+                            <input type="text" class="form-control" name="busqueda" placeholder="Buscar..." 
+                                value="{{ busqueda }}" autofocus 
+                                onchange="this.form.submit()">
+                            <img src="{% static 'img/lupa.png' %}" class="lupa" alt="lupa">
                         </div>
-                        
-                        <div class="boton-seccion">
+
+                        <!-- Botón agregar junto a la barra de búsqueda -->
+                        <div class="boton-seccion ml-2">
                             <button type="button" class="btn-guardar" data-bs-toggle="modal" data-bs-target="#compraModal">
                                 <img src="{% static 'img/agregar.png' %}" class="agregar" alt="agregar">
                             </button>
@@ -62,32 +45,25 @@
         </div>
         
         <!-- Si hay filtros activos, mostrar indicadores -->
-        {% if busqueda or valor_filtro %}
-            <div class="row">
+        {% if busqueda %}
+            <div class="row mb-3">
                 <div class="col-md-8 offset-md-2">
-                    <div class="filtros-activos">
+                    <div class="filtros-activos d-flex flex-wrap gap-2 align-items-center">
+                        <!-- Badge para el término de búsqueda -->
+                        <span class="badge busqueda-badge">
+                            Búsqueda: {{ busqueda }}
+                            <a href="{% url 'compras' %}" class="text-white ms-1 close-icon">×</a>
+                        </span>
+                        
+                        <!-- Badge para el tipo de búsqueda -->
+                        {% if tipo_busqueda == "proveedor" %}
+                            <span class="badge tipo-badge">Tipo: Nombre proveedor</span>
+                        {% elif tipo_busqueda == "fecha" %}
+                            <span class="badge tipo-badge">Tipo: Fecha de compra</span>
+                        {% endif %}
+                        
                         {% if busqueda %}
-                            <!-- Badge para el término de búsqueda -->
-                            <span class="badge bg-secondary me-2">Búsqueda: {{ busqueda }}
-                                <a href="?{% if tipo_filtro %}tipo_filtro={{ tipo_filtro }}&valor={{ valor_filtro }}{% endif %}" class="text-white ms-1">×</a>
-                            </span>
-                            {% if tipo_busqueda %}
-                                {% if tipo_busqueda == "fecha" %}
-                                    <span class="badge bg-info me-2">Tipo: Fecha de compra</span>
-                                {% else %}
-                                    <span class="badge bg-warning me-2">Tipo: Nombre proveedor</span>
-                                {% endif %}
-                            {% endif %}
-                        {% endif %}
-                        
-                        {% if valor_filtro %}
-                            <span class="badge bg-secondary me-2">Tipo: {{ valor_filtro }}
-                                <a href="?{% if busqueda %}busqueda={{ busqueda }}{% endif %}" class="text-white ms-1">×</a>
-                            </span>
-                        {% endif %}
-                        
-                        {% if busqueda or valor_filtro %}
-                            <a href="{% url 'compras' %}" class="btn btn-sm btn-outline-secondary">Limpiar todos</a>
+                            <a href="{% url 'compras' %}" class="btn btn-sm btn-outline-secondary">Limpiar</a>
                         {% endif %}
                     </div>
                 </div>
@@ -113,6 +89,11 @@
                             
                             <a href="#" data-bs-toggle="modal" class="btn-ver" data-bs-target="#detalleCompraModal-{{ compra.cod_com }}">Ver detalle</a>
                         </div>
+
+                        <!-- Botón para editar compra -->
+                        <button type="button" class="btn-editar" data-bs-toggle="modal" data-bs-target="#editModal-{{ compra.cod_com }}">
+                            <img src="{% static 'img/editar.png' %}" alt="editar" width="20">
+                        </button>
 
                         <!-- Botón para eliminar compra -->
                         <form action="{% url 'eliminar_compra' compra.cod_com %}" method="POST" id="delete-form-{{ compra.cod_com }}">
@@ -141,6 +122,92 @@
                             </div>
                         </div>
                         
+                        <!-- Modal para editar compra -->
+                        <div class="modal fade" id="editModal-{{ compra.cod_com }}" tabindex="-1" aria-labelledby="editModalLabel-{{ compra.cod_com }}" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editModalLabel-{{ compra.cod_com }}">Editar compra #{{ compra.cod_com }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="POST" action="{% url 'editar_compra' compra.cod_com %}" enctype="multipart/form-data" id="editar-compra-form-{{ compra.cod_com }}">
+                                            {% csrf_token %}
+                                            
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label for="fecha-edit-{{ compra.cod_com }}">Fecha de Compra:</label>
+                                                    <input type="date" id="fecha-edit-{{ compra.cod_com }}" name="fecha" class="form-control" value="{{ compra.fecha|date:'Y-m-d' }}" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="nom_prov-edit-{{ compra.cod_com }}">Proveedor:</label>
+                                                    <input type="text" id="nom_prov-edit-{{ compra.cod_com }}" name="nom_prov" class="form-control" value="{{ compra.nom_prov }}" required>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label for="cantidad-edit-{{ compra.cod_com }}">Cantidad de Animales:</label>
+                                                    <input type="number" id="cantidad-edit-{{ compra.cod_com }}" name="cantidad" class="form-control" min="1" value="{{ compra.cantidad }}" readonly>
+                                                    <small class="form-text text-muted">La cantidad de animales no puede ser modificada directamente.</small>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="precio_total-edit-{{ compra.cod_com }}">Precio Total:</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">$</span>
+                                                        <input type="text" id="precio_total-edit-{{ compra.cod_com }}" name="precio_total" class="form-control" value="{{ compra.precio_total|floatformat:0 }}" readonly>
+                                                    </div>
+                                                    <small class="form-text text-muted">El precio total se calculará automáticamente.</small>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Edición de detalles de animales -->
+                                            <h5 class="mt-4 mb-3">Detalles de Animales</h5>
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Código Animal</th>
+                                                            <th>Edad (meses)</th>
+                                                            <th>Peso (kg)</th>
+                                                            <th>Precio Unitario ($)</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for detalle in compra.detcom_set.all %}
+                                                        <tr>
+                                                            <td>
+                                                                <input type="text" name="cod_ani_{{ forloop.counter0 }}" class="form-control" value="{{ detalle.cod_ani }}" readonly>
+                                                                <input type="hidden" name="detalle_id_{{ forloop.counter0 }}" value="{{ detalle.cod_detcom }}">
+                                                            </td>
+                                                            <td>
+                                                                <input type="number" name="edad_anicom_{{ forloop.counter0 }}" class="form-control edad-edit" value="{{ detalle.edad_anicom }}" min="1" required>
+                                                            </td>
+                                                            <td>
+                                                                <input type="number" name="peso_anicom_{{ forloop.counter0 }}" class="form-control peso-edit" value="{{ detalle.peso_anicom }}" min="1" step="0.01" required>
+                                                            </td>
+                                                            <td>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-text">$</span>
+                                                                    <input type="number" name="precio_uni_{{ forloop.counter0 }}" class="form-control precio-uni-edit" value="{{ detalle.precio_uni|floatformat:0 }}" min="1" required data-compra="{{ compra.cod_com }}">
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <input type="hidden" name="num_detalles" value="{{ compra.detcom_set.count }}">
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="btn" form="editar-compra-form-{{ compra.cod_com }}">Guardar Cambios</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Modal para mostrar el detalle de esta compra específica -->
                         <div class="modal fade" id="detalleCompraModal-{{ compra.cod_com }}" tabindex="-1" aria-labelledby="detalleCompraModalLabel-{{ compra.cod_com }}" aria-hidden="true">
                             <div class="modal-dialog modal-lg">
@@ -205,8 +272,8 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <a href="{% url 'compra_pdf' compra.cod_com %}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-print"></i> Descargar
+                                        <a href="{% url 'compra_pdf' compra.cod_com %}" target="_blank" class="btn">
+                                            <i class="fas fa-print"></i> Descargar Informe
                                         </a>
 
                                         <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -259,6 +326,8 @@
                                     <span class="input-group-text">$</span>
                                     <input type="text" id="precio_total" name="precio_total" class="form-control" readonly>
                                 </div>
+                                <small class="form-text text-muted">El precio total se calculará automáticamente.</small>
+
                             </div>
                         </div>
                         
