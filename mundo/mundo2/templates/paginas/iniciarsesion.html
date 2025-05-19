@@ -60,13 +60,39 @@
                         <input type="checkbox" class="form-check-input" id="recordar" name="recordar">
                         <label class="form-check-label" for="recordar">Recordar</label>
                     </div>
-                    <a id="olvido" href="#">¿Olvidó su contraseña?</a>
+                    <!-- Enlace para mostrar el modal - Aquí está la clave -->
+                    <a id="olvido" href="{% url 'mostrar_recuperar_contrasena' %}">¿Olvidó su contraseña?</a>
                     <input type="submit" value="Iniciar Sesión">
                 </form>
             </div>
         </div>
+
+<!-- Modal para el olvido de contraseña -->
+{% if mostrar_modal %}
+    <div id="modalOlvido" class="modal modal-visible">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close"><a href="{% url 'iniciarsesion' %}">&times;</a></span>
+                <h3>Recuperar Contraseña</h3>
+            </div>
+            <form method="POST" action="{% url 'recuperar_contrasena' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p>Ingrese su correo electrónico para recibir instrucciones sobre cómo restablecer su contraseña.</p>   
+                    <div class="form-group">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Ingresa tu correo electrónico" required>
+                        {% if email_error %}
+                            <div class="error-container">{{ email_error }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="submit-btn">Enviar</button>
+                </div>
+            </form>
+        </div>
     </div>
+{% endif %}
 
-
-
+    <script src="{% static 'js/mensajes.js' %}"></script>
 {% endblock %}

@@ -1,6 +1,12 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.models import User
+import secrets
+import datetime
+from django.core.mail import send_mail
+from django.urls import reverse
+from django.conf import settings
+from django.utils import timezone
 
 # Create your models here.
 
@@ -9,8 +15,12 @@ class Administrador(models.Model):
     nom_usu = models.CharField(unique=True, max_length=50)
     finca = models.CharField(max_length=500)
     correo = models.CharField(max_length=70)
+    token_verificacion = models.CharField(max_length=255, null=True, blank=True)
+    token_expira = models.DateTimeField(null=True, blank=True)
+    email_verificado = models.BooleanField(default=False)
     contraseña = models.CharField(max_length=128)
     confcontraseña = models.CharField(max_length=128)
+    last_login = models.DateTimeField(null=True, blank=True)  
 
     class Meta:
         managed = False
@@ -25,6 +35,67 @@ class Administrador(models.Model):
             self.confcontraseña = make_password(self.confcontraseña)
             
         super().save(*args, **kwargs)
+    # Para compatibilidad con el sistema de autenticación de Django
+    @property
+    def password(self):
+        return self.contraseña
+        
+    @password.setter
+    def password(self, value):
+        self.contraseña = value
+    
+    def get_email_field_name(self):
+        return 'correo'
+        
+    def get_username(self):
+        return self.nom_usu
+        
+    @property
+    def is_anonymous(self):
+        return False
+        
+    @property
+    def is_authenticated(self):
+        return True
+        
+    def get_full_name(self):
+        return self.nom_usu
+        
+    def get_short_name(self):
+        return self.nom_usu
+    def generar_token_verificacion(self):
+        # Crear un token aleatorio
+        self.token_verificacion = secrets.token_urlsafe(32)
+        # El token expirará en 24 horas
+        self.token_expira = timezone.now() + datetime.timedelta(hours=24)
+        self.save()
+        
+    def enviar_email_verificacion(self, request):
+        """Envía un correo electrónico con el enlace de verificación"""
+        verificacion_url = request.build_absolute_uri(
+            reverse('verificar_email', kwargs={'token': self.token_verificacion})
+        )
+        
+        asunto = 'Verifica tu dirección de correo electrónico'
+        mensaje = f'''
+        Hola {self.nom_usu},
+        
+        Gracias por registrarte. Por favor, haz clic en el siguiente enlace para verificar tu correo electrónico:
+        
+        {verificacion_url}
+        
+        Este enlace expirará en 24 horas.
+        
+        Si no solicitaste este registro, puedes ignorar este mensaje.
+        '''
+        
+        send_mail(
+            asunto,
+            mensaje,
+            settings.DEFAULT_FROM_EMAIL,
+            [self.correo],
+            fail_silently=False,
+        )
 
 class Agenda(models.Model):
     cod_age = models.AutoField(primary_key=True)

@@ -7,7 +7,16 @@ from .models import Administrador, Agenda, Animal, Documento, Compra, DetCom, Ve
 from django.db import connection
 from functools import wraps
 from datetime import date, datetime, timedelta
+from django.utils import timezone  # Importación correcta para timezone
 import calendar, re
+from django.template.loader import render_to_string
+from django.conf import settings
+from django.contrib.auth.hashers import make_password
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import force_str, force_bytes
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.contrib.auth.tokens import default_token_generator
 from django.db import transaction
 from xhtml2pdf import pisa
 from django.template.loader import render_to_string
@@ -35,9 +44,19 @@ def registro(request):
         
         if form.is_valid():
             try:
-                # Guardar el administrador con ambas contraseñas
-                administrador = form.save()
-                messages.success(request, "¡Registro exitoso! Ahora puedes iniciar sesión.")
+                # Guardar el administrador con ambas contraseñas pero como no verificado
+                administrador = form.save(commit=False)
+                administrador.email_verificado = False
+                administrador.save()
+                
+                # Generar token de verificación y enviar correo
+                administrador.generar_token_verificacion()
+                administrador.enviar_email_verificacion(request)
+                
+                messages.success(
+                    request, 
+                    "¡Registro exitoso! Por favor, verifica tu correo electrónico para activar tu cuenta."
+                )
                 return redirect('iniciarsesion')
             except Exception as e:
                 # Si hay error al guardar, mostrarlo
@@ -51,7 +70,31 @@ def registro(request):
     return render(request, 'paginas/registro.html', {
         'form': form,
         'current_page_name': 'Registro'
-})
+    })
+
+# Vista para verificar el correo electrónico
+def verificar_email(request, token):
+    try:
+        # Buscar el administrador con este token
+        administrador = Administrador.objects.get(token_verificacion=token)
+        
+        # Verificar si el token ha expirado
+        if administrador.token_expira and administrador.token_expira < timezone.now():
+            messages.error(request, "El enlace de verificación ha expirado. Por favor, solicita uno nuevo.")
+            return redirect('iniciarsesion')
+        
+        # Marcar como verificado
+        administrador.email_verificado = True
+        administrador.token_verificacion = None
+        administrador.token_expira = None
+        administrador.save()
+        
+        messages.success(request, "¡Tu correo electrónico ha sido verificado correctamente! Ahora puedes iniciar sesión.")
+        return redirect('iniciarsesion')
+        
+    except Administrador.DoesNotExist:
+        messages.error(request, "El enlace de verificación no es válido.")
+        return redirect('iniciarsesion') 
 
 def iniciarsesion(request):
     error_user = None
@@ -102,6 +145,153 @@ def iniciarsesion(request):
         'error_password': error_password,
         'current_page_name': 'Iniciar Sesión'
     })
+
+def mostrar_recuperar_contrasena(request):
+    """
+    Esta vista simplemente muestra la misma plantilla de inicio de sesión
+    pero con el modal de recuperación de contraseña visible
+    """
+    return render(request, 'paginas/iniciarsesion.html', {
+        'mostrar_modal': True,
+        'current_page_name': 'Recuperar Contraseña'
+    })
+
+def recuperar_contrasena(request):
+    """
+    Esta vista procesa el formulario de recuperación de contraseña
+    """
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        
+        if not email:
+            return render(request, 'paginas/iniciarsesion.html', {
+                'mostrar_modal': True,
+                'email_error': 'El correo electrónico es obligatorio',
+                'current_page_name': 'Recuperar Contraseña'
+            })
+        
+        try:
+            # Verificar si existe un administrador con ese correo
+            admin = Administrador.objects.filter(correo=email).first()
+            
+            if admin:
+                # Generar el token y el uid codificado para el enlace de restablecimiento
+                uid = urlsafe_base64_encode(force_bytes(admin.pk))
+                token = default_token_generator.make_token(admin)
+                
+                # Construir el enlace de restablecimiento
+                reset_link = f"{request.scheme}://{request.get_host()}/reset-password/{uid}/{token}/"
+                
+                try:
+                    # Preparar y enviar el correo
+                    subject = "Restablecimiento de contraseña - Mundo Bovino"
+                    message = render_to_string('paginas/reset_password_email.html', {
+                        'user': admin,
+                        'reset_link': reset_link,
+                        'site_name': 'Mundo Bovino'
+                    })
+                    
+                    # Cambiado fail_silently a False para que muestre errores
+                    send_mail(
+                        subject,
+                        message,
+                        settings.DEFAULT_FROM_EMAIL,
+                        [admin.correo],
+                        html_message=message,
+                        fail_silently=False
+                    )
+                    print(f"Correo enviado exitosamente a {admin.correo}")
+                except Exception as email_error:
+                    print(f"Error al enviar correo: {email_error}")
+                    # Ahora mostramos el error al usuario para facilitar la depuración
+                    messages.error(request, f"Problema al enviar el correo: {email_error}")
+                    return redirect('iniciarsesion')
+                
+            # Por seguridad, mostramos un mensaje genérico independientemente de si el correo existe o no
+            messages.success(request, "Si el correo está asociado a una cuenta, recibirás instrucciones para restablecer tu contraseña.")
+            return redirect('iniciarsesion')
+            
+        except Exception as e:
+            print(f"Error durante recuperación de contraseña: {e}")
+            messages.error(request, f"{str(e)}")
+            return redirect('iniciarsesion')
+    
+    # Si no es POST, redirigir a la página de inicio de sesión
+    return redirect('iniciarsesion')
+
+def reset_password(request, uidb64, token):
+    """
+    Vista para mostrar el formulario de restablecimiento de contraseña
+    cuando el usuario hace clic en el enlace del correo
+    """
+    try:
+        # Decodificar el uid para obtener el ID del usuario
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        admin = Administrador.objects.get(pk=uid)
+        
+        # Verificar que el token sea válido
+        if default_token_generator.check_token(admin, token):
+            print(f"Token válido para el usuario: {admin.nom_usu}")
+            return render(request, 'paginas/reset_password.html', {
+                'valid': True,
+                'uidb64': uidb64,
+                'token': token,
+                'current_page_name': 'Restablecer Contraseña'
+            })
+        else:
+            print("Token inválido o expirado")
+            messages.error(request, "El enlace de restablecimiento no es válido o ha expirado.")
+            return redirect('iniciarsesion')
+            
+    except Exception as e:
+        print(f"Error en reset_password: {e}")
+        messages.error(request, f"Error al procesar el enlace de restablecimiento: {e}")
+        return redirect('iniciarsesion')
+    
+def reset_password_confirm(request):
+    """
+    Vista para procesar el formulario de restablecimiento de contraseña
+    """
+    if request.method == 'POST':
+        uidb64 = request.POST.get('uidb64')
+        token = request.POST.get('token')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+        
+        # Validar que ambas contraseñas coincidan
+        if password1 != password2:
+            return render(request, 'paginas/reset_password.html', {
+                'valid': True,
+                'uidb64': uidb64,
+                'token': token,
+                'error': 'Las contraseñas no coinciden',
+                'current_page_name': 'Restablecer Contraseña'
+            })
+        
+        try:
+            # Decodificar el uid para obtener el ID del usuario
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            admin = Administrador.objects.get(pk=uid)
+            
+            # Verificar que el token sea válido
+            if default_token_generator.check_token(admin, token):
+                # Cambiar la contraseña usando el nombre correcto del campo (contraseña con ñ)
+                admin.contraseña = make_password(password1)
+                admin.confcontraseña = make_password(password1)  # Actualizar también la confirmación
+                admin.save()
+                
+                messages.success(request, "Tu contraseña ha sido restablecida con éxito. Ahora puedes iniciar sesión.")
+                return redirect('iniciarsesion')
+            else:
+                messages.error(request, "El enlace de restablecimiento no es válido o ha expirado.")
+                return redirect('iniciarsesion')
+                
+        except (TypeError, ValueError, OverflowError, Administrador.DoesNotExist):
+            messages.error(request, "El enlace de restablecimiento no es válido.")
+            return redirect('iniciarsesion')
+    
+    # Si no es POST, redirigir a la página de inicio de sesión
+    return redirect('iniciarsesion')
 
 def login_required(view_func):
     @wraps(view_func)

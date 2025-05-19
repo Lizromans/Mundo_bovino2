@@ -1,0 +1,161 @@
+:root {
+    --color-fondo: #f8dfb3;
+    --color-primario: #D3B177;
+    --color-secundario: #947643;
+    --gradient-header: linear-gradient(90deg, rgba(211,177,119,1) 25%, rgba(109,92,62,1) 100%);
+}
+
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--color-fondo);
+    height: 90vh;
+}
+
+header {
+    background: var(--gradient-header);
+    height: 13vh;
+    align-items: center;
+    width: 100vw;
+}
+
+#logo1 {
+    height: 160px;
+    margin-left: 30px;
+    border-radius: 100px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
+    margin-top: 7px;
+}
+
+main{
+    grid-area: main;
+    width: 100vw;
+    
+}
+
+.reset-password-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.card {
+    margin-top: 11.8vh;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 11.8vh;
+}
+
+.card-header {
+    background-color: var(--color-primario) !important;
+    color: #000000 !important;
+}
+
+.btn-primary {
+    background-color: var(--color-secundario);
+    border-color: var(--color-secundario);
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primario);
+    border-color: var(--color-primario);
+    color: #000000 !important;
+}
+
+footer {
+    background: var(--gradient-header);
+    width: 100vw;
+    height: 13vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.derechos {
+    margin: 0;
+}
+
+.soporte button {
+    background-color: var(--color-primario);
+    height: 30px;
+    width: 160px;
+    border-radius: 20px;
+    border: #000000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    color: #000000;
+    cursor: pointer;
+}
+
+.soporte button:hover {
+    background-color: var(--color-secundario);
+    color: #ffffff;
+}
+
+/* Overlay para los popups */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Estilos para el contenedor del mensaje popup */
+.popup-message {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    padding: 25px;
+    max-width: 400px;
+    width: 90%;
+    position: relative;
+    animation: popIn 0.3s ease-out;
+}
+
+/* Animación para la aparición del popup */
+@keyframes popIn {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Laptops (1024px to 1440px) */
+@media screen and (min-width: 1024px) and (max-width: 1340px) {
+    #logo1{
+        width: 160px;
+        height: 160px;
+        margin-left: 20px;
+    }
+
+    .soporte {
+        left: 85%;
+    } 
+}
+
+/* Desktop Computers (1441px and above) */
+@media screen and (min-width: 1400px) {
+    #logo1{
+        width: 140px;
+        height: 140px;
+        margin-left: 20px;
+    }
+    
+
+    .soporte {
+        left: 85%;
+    }
+    
+    footer{
+        margin-top: 133px;
+    }
+}

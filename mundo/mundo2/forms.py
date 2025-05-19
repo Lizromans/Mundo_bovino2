@@ -1,10 +1,12 @@
 from django import forms
 from .models import Administrador
 from django.core.exceptions import ValidationError
+from django.contrib.auth.hashers import make_password
+from django.utils import timezone
+import secrets
+import datetime
 
 class AdministradorRegistroForm(forms.ModelForm):
-    # No necesitamos definir confcontraseña como un field adicional porque ya está en el modelo
-    
     class Meta:
         model = Administrador
         fields = ['nom_usu', 'correo', 'finca', 'contraseña', 'confcontraseña']
@@ -30,9 +32,6 @@ class AdministradorRegistroForm(forms.ModelForm):
         
         if contraseña and confcontraseña and contraseña != confcontraseña:
             raise ValidationError("Las contraseñas no coinciden")
-        else:
-            # Marcar que las contraseñas coinciden para el método save
-            self.instance._passwords_matched = True
         
         return cleaned_data
     
@@ -52,10 +51,6 @@ class AdministradorRegistroForm(forms.ModelForm):
         contraseña = self.cleaned_data.get('contraseña')
         if len(contraseña) < 8:
             raise ValidationError("La contraseña debe tener al menos 8 caracteres")
-        
-        # Puedes añadir más validaciones aquí si lo necesitas
-        # Por ejemplo, validar que tenga mayúsculas, minúsculas, números, etc.
-        
         return contraseña
     
     def clean_finca(self):
@@ -63,3 +58,14 @@ class AdministradorRegistroForm(forms.ModelForm):
         if len(finca) < 2:
             raise ValidationError("El nombre de la finca debe tener al menos 2 caracteres")
         return finca
+    
+    def save(self, commit=True):
+        administrador = super().save(commit=False)
+        
+        # No necesitamos hacer ninguna manipulación especial de las contraseñas aquí
+        # porque el modelo ya se encarga de hashearlas en su método save()
+        
+        if commit:
+            administrador.save()
+        
+        return administrador

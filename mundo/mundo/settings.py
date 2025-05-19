@@ -111,7 +111,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-co'
+LANGUAGES = [
+    ('es', 'Español'),
+    ('en', 'English'),
+]
 
 TIME_ZONE = 'UTC'
 
@@ -134,4 +138,15 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'mundobovinoapp@gmail.com'
+EMAIL_HOST_PASSWORD = 'pwgm yfvf yagn sgvl'
+DEFAULT_FROM_EMAIL = 'Mundo Bovino <mundobovinoapp@gmail.com>'
+
+# Configuración del framework de mensajes
+from django.contrib.messages import constants as messages
 
