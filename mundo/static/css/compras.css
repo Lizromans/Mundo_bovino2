@@ -119,6 +119,7 @@ button {
     width: 30px;
     height: 30px;
     cursor: pointer;
+    margin-top: -1%;
 }
 
 .agregar:hover {
@@ -529,6 +530,32 @@ button {
 }
 
 .search-container {
-    margin-right: 15px;
+    margin-right: 17px;
     position: relative;
+}
+
+/* Responsive Media Queries */
+/* Laptops (1024px a 1340px) */
+@media screen and (min-width: 1024px) and (max-width: 1340px) {
+    
+}
+
+/* Desktop Computers (1600px y above) */
+@media screen and (min-width: 1400px) {
+    .navbar-form {
+    position: relative;
+    margin-top: 2%;
+    margin-bottom: 3%;
+    width: 100%;
+    margin-left: 15%;
+    }
+    .fichas {
+    background-color: #f9f9f9b7;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 15px;
+    position: relative;
+    margin-bottom: 23.5%;
+    transition: transform 0.5s ease, box-shadow 0.3s ease;
+    }
 }

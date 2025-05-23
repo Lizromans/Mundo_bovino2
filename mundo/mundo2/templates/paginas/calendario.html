@@ -196,65 +196,65 @@
       </div>
 
       <!-- Panel derecho para mostrar eventos -->
-    <div id="events-list" class="{% if eventos_del_dia|length == 1 %}single-event{% elif eventos_del_dia|length > 1 %}multiple-events{% endif %}">
-        <!-- Botón agregar evento -->
-        <div class="add-event-button">
-            {% if fecha_seleccionada %}
-                <a href="?dia={{ fecha_seleccionada.day }}&mes={{ fecha_seleccionada.month }}&año={{ fecha_seleccionada.year }}&mostrar_formulario=True" class="btn-agregar">
-                    <img src="{% static 'img/agregar.png' %}" class="agregar" alt="agregar">
-                </a>
-            {% else %}
-                <a href="?dia={{ fecha_actual.day }}&mes={{ fecha_actual.month }}&año={{ fecha_actual.year }}&mostrar_formulario=True" class="btn-agregar">
-                    <img src="{% static 'img/agregar.png' %}" class="agregar" alt="agregar">
-                </a>
-            {% endif %}
-        </div>
-        
-        <!-- Contenido del panel de eventos -->
-        {% if eventos_del_dia %}
-            <!-- Mostrar todos los eventos del día seleccionado -->
-            {% for evento in eventos_del_dia %}
-                <div class="event-display-container">
-                    <div class="event-image-container">
-                        <img src="{% static 'img/imagen.png' %}" alt="imagen">
-                    </div>
-                    <div class="event-card tipo-{{ evento.tipo }} {% if evento.estado == 'Realizada' %}estado-realizado{% endif %}">
-                        <h4>{{ evento.tipo }}</h4>
-                        <p class="event-time">{{ evento.fecha|date:"d/m/Y" }} - {{ evento.hora }}</p>
-                        <p class="event-location">Estado: {{ evento.estado }}</p>
-                        <p class="event-details">{{ evento.descripcion }}</p>
-                        <div class="event-actions">
-                            <a href="?dia={{ evento.fecha.day }}&mes={{ evento.fecha.month }}&año={{ evento.fecha.year }}&evento={{ evento.cod_age }}&mostrar_formulario_editar=True" class="btn-editar">
-                                <img src="{% static 'img/editar.png' %}" alt="editar">
-                            </a>
-                            <!-- Botón para eliminar evento -->
-                            <form action="{% url 'eliminar_evento' evento.cod_age %}" method="POST" id="delete-form-{{ evento.cod_age }}">
-                                {% csrf_token %}
-                                <button type="button" class="btn-eliminar" onclick="document.getElementById('confirmDeleteModal-{{ evento.cod_age }}').style.display='flex'">
-                                    <img src="{% static 'img/eliminar.png' %}" alt="eliminar" width="20">
-                                </button>
-                            </form>
+        <div id="events-list" class="{% if eventos_del_dia|length == 1 %}single-event{% elif eventos_del_dia|length > 1 %}multiple-events{% endif %}">
+            <!-- Botón agregar evento -->
+            <div class="add-event-button">
+                {% if fecha_seleccionada %}
+                    <a href="?dia={{ fecha_seleccionada.day }}&mes={{ fecha_seleccionada.month }}&año={{ fecha_seleccionada.year }}&mostrar_formulario=True" class="btn-agregar">
+                        <img src="{% static 'img/agregar.png' %}" class="agregar" alt="agregar">
+                    </a>
+                {% else %}
+                    <a href="?dia={{ fecha_actual.day }}&mes={{ fecha_actual.month }}&año={{ fecha_actual.year }}&mostrar_formulario=True" class="btn-agregar">
+                        <img src="{% static 'img/agregar.png' %}" class="agregar" alt="agregar">
+                    </a>
+                {% endif %}
+            </div>
+            
+            <!-- Contenido del panel de eventos -->
+            {% if eventos_del_dia %}
+                <!-- Mostrar todos los eventos del día seleccionado -->
+                {% for evento in eventos_del_dia %}
+                    <div class="event-display-container">
+                        <div class="event-image-container">
+                            <img src="{% static 'img/imagen.png' %}" alt="imagen">
+                        </div>
+                        <div class="event-card tipo-{{ evento.tipo }} {% if evento.estado == 'Realizada' %}estado-realizado{% endif %}">
+                            <h4>{{ evento.tipo }}</h4>
+                            <p class="event-time">{{ evento.fecha|date:"d/m/Y" }} - {{ evento.hora }}</p>
+                            <p class="event-location">Estado: {{ evento.estado }}</p>
+                            <p class="event-details">{{ evento.descripcion }}</p>
+                            <div class="event-actions">
+                                <a href="?dia={{ evento.fecha.day }}&mes={{ evento.fecha.month }}&año={{ evento.fecha.year }}&evento={{ evento.cod_age }}&mostrar_formulario_editar=True" class="btn-editar">
+                                    <img src="{% static 'img/editar.png' %}" alt="editar">
+                                </a>
+                                <!-- Botón para eliminar evento -->
+                                <form action="{% url 'eliminar_evento' evento.cod_age %}" method="POST" id="delete-form-{{ evento.cod_age }}">
+                                    {% csrf_token %}
+                                    <button type="button" class="btn-eliminar" onclick="document.getElementById('confirmDeleteModal-{{ evento.cod_age }}').style.display='flex'">
+                                        <img src="{% static 'img/eliminar.png' %}" alt="eliminar" width="20">
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Modal de confirmación personalizado -->
-                <div id="confirmDeleteModal-{{ evento.cod_age }}" class="custom-modal">
-                    <div class="custom-modal-content">
-                        <div class="custom-modal-header">
-                            <h3>Confirmar eliminación</h3>
-                        </div>
-                        <div class="custom-modal-body">
-                            <p>¿Estás seguro de eliminar este {{ evento.tipo }} con estado {{ evento.estado}}?</p>
-                        </div>
-                        <div class="custom-modal-footer">
-                            <button type="button" class="btn-cancelar" onclick="document.getElementById('confirmDeleteModal-{{ evento.cod_age }}').style.display='none'">Cancelar</button>
-                            <button type="button" class="btn-confirmar" onclick="document.getElementById('delete-form-{{ evento.cod_age }}').submit()">Eliminar</button>
+                    
+                    <!-- Modal de confirmación personalizado -->
+                    <div id="confirmDeleteModal-{{ evento.cod_age }}" class="custom-modal">
+                        <div class="custom-modal-content">
+                            <div class="custom-modal-header">
+                                <h3>Confirmar eliminación</h3>
+                            </div>
+                            <div class="custom-modal-body">
+                                <p>¿Estás seguro de eliminar este {{ evento.tipo }} con estado {{ evento.estado}}?</p>
+                            </div>
+                            <div class="custom-modal-footer">
+                                <button type="button" class="btn-cancelar" onclick="document.getElementById('confirmDeleteModal-{{ evento.cod_age }}').style.display='none'">Cancelar</button>
+                                <button type="button" class="btn-confirmar" onclick="document.getElementById('delete-form-{{ evento.cod_age }}').submit()">Eliminar</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
-        {% elif evento_seleccionado %}
+                {% endfor %}
+            {% elif evento_seleccionado %}
             <!-- Mostrar el evento seleccionado cuando no hay múltiples eventos -->
             <div class="event-display-container">
                 <div class="event-image-container">

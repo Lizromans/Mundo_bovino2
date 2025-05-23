@@ -372,3 +372,22 @@ input[type="password"] {
         transform: none;
     }
 }
+
+/* Laptops (1024px to 1440px) */
+@media screen and (min-width: 1024px) and (max-width: 1340px) {
+}
+
+/* Desktop Computers (1441px and above) */
+@media screen and (min-width: 1400px) {
+    .formulario {
+    background-color: #D3B177;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    height: 100%;
+    border-radius: 30px;
+    max-width: 30%;
+    position: relative;
+    left: 60%;
+    margin-top: -36%;
+    margin-bottom: -6%;
+}
+}

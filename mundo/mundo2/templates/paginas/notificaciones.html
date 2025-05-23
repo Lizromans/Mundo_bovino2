@@ -43,48 +43,6 @@
                 </label>
             </div>
             
-            <div class="notification-item">
-                <div class="notification-info">
-                    <div class="notification-title">Notificaciones Módulos</div>
-                    <div class="sub-options">
-                        <div class="sub-option">
-                            <div class="checkbox-container">
-                                <input type="checkbox" id="inventario" name="notif_inventario" {% if notif_inventario %}checked{% endif %}>
-                                <label for="inventario" class="checkbox-label">Inventario</label>
-                            </div>
-                        </div>
-                        <div class="sub-option">
-                            <div class="checkbox-container">
-                                <input type="checkbox" id="registro-ventas" name="notif_ventas" {% if notif_ventas %}checked{% endif %}>
-                                <label for="registro-ventas" class="checkbox-label">Registro de Ventas</label>
-                            </div>
-                        </div>
-                        <div class="sub-option">
-                            <div class="checkbox-container">
-                                <input type="checkbox" id="calendario-eventos" name="notif_calendario" {% if notif_calendario %}checked{% endif %}>
-                                <label for="calendario-eventos" class="checkbox-label">Calendario</label>
-                            </div>
-                        </div>
-                        <div class="sub-option">
-                            <div class="checkbox-container">
-                                <input type="checkbox" id="documentos" name="notif_documentos" {% if notif_documentos %}checked{% endif %}>
-                                <label for="documentos" class="checkbox-label">Documentos</label>
-                            </div>
-                        </div>
-                        <div class="sub-option">
-                            <div class="checkbox-container">
-                                <input type="checkbox" id="agenda" name="notif_agenda" {% if notif_agenda %}checked{% endif %}>
-                                <label for="agenda" class="checkbox-label">Agenda</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <label class="toggle">
-                    <input type="checkbox" name="notif_modulos" id="toggle-modulos" {% if notif_modulos %}checked{% endif %}>
-                    <span class="slider"></span>
-                </label>
-            </div>
-            
             <div class="button-container">
                 <button type="submit" class="save-button">Guardar cambios</button>
             </div>

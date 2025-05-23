@@ -54,6 +54,7 @@ button {
     gap: 30px;
     justify-content: space-between;
     margin-bottom: 8%;
+    margin-right: 10%;
 }
 
 .calendar-wrapper {
@@ -332,7 +333,7 @@ button {
     flex: 1.2;
     order: 2;
     background-color: #f9f9f9;
-    border-radius: 5px;
+    border-radius: 20px;
     padding: 20px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     max-width: 550px;
@@ -341,6 +342,7 @@ button {
     max-height: 250px;
     overflow-y: auto;
     margin-top: 8%;
+    margin-right: 3%;
 }
 
 #events-list.multiple-events {
@@ -822,9 +824,8 @@ textarea.form-control {
    15. FILTRADO Y BÚSQUEDA
    ======================== */
 .filtrado-container {
-    margin-left: 70%;
+    margin-left: 87%;
     padding: 2px;
-    width: 100%;
 }
 
 .filtrado-container .form-filtrado {
@@ -1040,7 +1041,8 @@ textarea.form-control {
    ======================== */
 @media screen and (min-width: 1400px) {
     .calendar-container {
-        margin-top: 4%;
+        margin-top: 6%;
+        margin-bottom: 11.5% ;
     }
 
     .filtrado-container {

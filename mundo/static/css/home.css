@@ -198,7 +198,8 @@ h6 {
 /* Desktop Computers (1600px y above) */
 @media screen and (min-width: 1400px) {
     .container-fluid {
-        margin-top: 4%;
+        margin-top: 4.5%;
+        margin-bottom: 4%;
         padding: 10px;
     }
 

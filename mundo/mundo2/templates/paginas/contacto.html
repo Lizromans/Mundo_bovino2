@@ -201,11 +201,11 @@
             <div class="modal-content">
                 <div class="container mt-4">
                     <h4>Registro de Contactos</h4>
-                    <form method="POST" action="{% url 'registrar_contacto' %}" id="animal">
+                    <form method="POST" action="{% url 'registrar_contacto' %}" id="formulario-contacto">
                         {% csrf_token %}
                         <div class="mb-3">
                             <label for="nombre" class="form-label">Nombre:</label>
-                            <input type="text" class="form-control" id="edad" name="nombre" required>
+                            <input type="text" class="form-control" id="nombre" name="nombre" required>
                         </div>
                         <div class="mb-3">
                             <label for="cargo" class="form-label">Cargo:</label>
@@ -218,11 +218,11 @@
                         </div> 
                         <div class="mb-3">
                             <label for="correo" class="form-label">Correo:</label>
-                            <input type="text" class="form-control" id="raza" name="correo" required>
+                            <input type="email" class="form-control" id="correo" name="correo" required>
                         </div>
                         <div class="mb-3">
-                            <label for="telefono" class="form-label">Telefono:</label>
-                            <input type="text" class="form-control" id="raza" name="telefono" required>
+                            <label for="telefono" class="form-label">Teléfono:</label>
+                            <input type="tel" class="form-control" id="telefono" name="telefono" required>
                         </div>  
                     </form>            
                 </div>
@@ -231,7 +231,8 @@
                         {% csrf_token %}
                         <button type="submit" class="btn">Cancelar</button>
                     </form>
-                    <button type="submit" class="btn" form="formulario-compra">Registrar Contacto</button>
+                    <!-- CORRECCIÓN: Cambiar form="contacto" por form="formulario-contacto" -->
+                    <button type="submit" class="btn" form="formulario-contacto">Registrar Contacto</button>
                 </div>
             </div>
         </div>

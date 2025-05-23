@@ -228,20 +228,20 @@ footer {
     width: 100vw;
     height: 13vh;
     display: flex;
-    justify-content: flex-end;
     align-items: center;
     margin-top: auto;
 }
 
-.soporte {
-    margin-right: 5%;
+.derechos {
+    margin-left: 2%;
+    margin-top: 1%;
 }
 
-.soporte button {
+#soporte{
     background-color: var(--color-primario);
     height: 40px;
-    width: 160px;
-    border-radius: 20px;
+    width: 100%;
+    border-radius: 10px;
     border: none;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     color: #000000;
@@ -249,9 +249,9 @@ footer {
     font-size: 1rem;
 }
 
-.soporte button:hover {
+#soporte:hover{
     background-color: var(--color-secundario);
-    color: #ffffff;
+    color: #fdf6f6;
 }
 
 /* Laptops (1024px to 1440px) */
@@ -270,14 +270,20 @@ footer {
 /* Desktop Computers (1441px and above) */
 @media screen and (min-width: 1400px) {
     #logo1{
-        width: 140px;
-        height: 140px;
+        width: 170px;
+        height: 170px;
         margin-left: 20px;
     }
     
-
-    .soporte {
-        left: 85%;
+    .container {
+    background-color: #ffffff9d;
+    height: 290px;
+    width: 100%;
+    max-width: 80%;
+    margin-bottom: 5%;
+    padding: 20px 0;
+    border-radius: 10px;
+    margin-left: 11%;   
     }
     
     footer{

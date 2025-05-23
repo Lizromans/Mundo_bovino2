@@ -517,12 +517,14 @@ input[type="password"] {
 /* Desktop Computers (1600px y above) */
 @media screen and (min-width: 1400px) {
     .mensaje {
-        margin-top: 130px;
+        margin-top: 9%;
+        margin-bottom: 9%;
         width: 500px;
     }
 
     .formulario {
         min-width: 400px;
+        margin-left: 16%;
     }
 
 }
